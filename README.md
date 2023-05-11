@@ -1,4 +1,4 @@
-# pd-naja-extensions
+# pd-naja
 
 1. [Quick start](#quick-start)
 2. [Utilities](#utilities)
