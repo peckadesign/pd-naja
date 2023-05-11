@@ -24,8 +24,8 @@ export interface AjaxModal {
 	// id's of snippets, that are necessary for modal function
 	reservedSnippetIds: string[]
 
-	show(opener: Element | undefined, options: any, event: Event): void
-	hide(event: Event): void
+	show(opener: Element | undefined, options: any, event: BeforeEvent | PopStateEvent): void
+	hide(event: SuccessEvent | PopStateEvent): void
 	isShown(): boolean
 
 	onShow: CallbackFn
@@ -34,7 +34,7 @@ export interface AjaxModal {
 
 	dispatchLoad?: (options: any, event: SuccessEvent | PopStateEvent) => void
 
-	getOptions(element: Element): any
+	getOptions(opener: Element): any
 	setOptions(options: any): void
 }
 

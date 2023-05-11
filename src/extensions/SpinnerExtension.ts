@@ -5,12 +5,11 @@ import { InteractionEvent } from 'naja/dist/core/UIHandler'
  * @author Radek Šerý
  *
  * Spinner - loading indicator:
- * 1. Extension can be turned off by using data-naja-spinner="off".
- * 2. If there is data-naja-spinner with different value, this value is used as a selector for element into which the
- *    Spinner is appended.
- * 3. If there is no data-naja-spinner, closest .ajax-wrap is being searched for and:
- *    a. If there is .ajax-spinner inside, this element is used for Spinner.
- *    b. If not, the Spinner is appended into .ajax-wrap itself.
+ * 1. Extension can be turned off by using `data-naja-spinner="off"`.
+ * 2. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the spinner element is appended.
+ * 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
+ *    i.  If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
+ *    ii. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
  */
 
 declare module 'naja/dist/Naja' {
@@ -19,23 +18,23 @@ declare module 'naja/dist/Naja' {
 	}
 }
 
-type spinnerFn = (props?: any) => Element
-type spinnerPropsFn = ((element: Element) => any) | undefined
+type spinnerType = ((props?: any) => Element) | Element
+type spinnerPropsFn = ((initiator: Element) => any) | undefined
 
 export class SpinnerExtension implements Extension {
-	public readonly getSpinner: spinnerFn
+	public readonly spinner: spinnerType
 	public readonly getSpinnerProps?: spinnerPropsFn
 
 	public readonly ajaxSpinnerWrapSelector: string
 	public readonly ajaxSpinnerPlaceholderSelector: string
 
 	public constructor(
-		getSpinner: spinnerFn,
+		spinner: spinnerType,
 		getSpinnerProps: spinnerPropsFn = undefined,
 		ajaxSpinnerWrapSelector = '.ajax-wrap',
 		ajaxSpinnerPlaceholderSelector = '.ajax-spinner'
 	) {
-		this.getSpinner = getSpinner
+		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
 
 		this.ajaxSpinnerWrapSelector = ajaxSpinnerWrapSelector
@@ -69,9 +68,13 @@ export class SpinnerExtension implements Extension {
 			options.spinnerQueue = options.spinnerQueue || []
 
 			placeholders.forEach((placeholder) => {
-				const spinner = this.getSpinnerProps
-					? this.getSpinner(this.getSpinnerProps(spinnerInitiator))
-					: this.getSpinner()
+				let spinner: Element
+
+				if (typeof this.spinner === 'function') {
+					spinner = this.getSpinnerProps ? this.spinner(this.getSpinnerProps(spinnerInitiator)) : this.spinner()
+				} else {
+					spinner = this.spinner
+				}
 
 				placeholder.appendChild(spinner)
 				options.spinnerQueue.push(spinner)
