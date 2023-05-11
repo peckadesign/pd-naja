@@ -1,5 +1,11 @@
 # pd-naja-extensions
 
+1. [Quick start](#quick-start)
+2. [Utilities](#utilities)
+3. [Extensions](#extensions)
+   1. [AjaxModalExtension](#ajaxmodalextension)
+   2. [SpinnerExtension](#spinnerextension)
+
 ## Quick start
 ```
 $ npm install naja @peckadesign/pd-naja
@@ -25,7 +31,7 @@ controlManager.addControlOnLive(SomeControl)
 
 ```
 
-## Utils
+## Utilities
 This package provides easy ways to add JS components reactive to Naja ajax events.
 
 `Control` is meant to be used for standalone components, that might be dependent on ajax. It should be used together with `ControlManager`. Class implementing the `Control` interface **should export its instance**. Then the intended lifecycle of class is as follows:
