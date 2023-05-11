@@ -24,7 +24,7 @@ jobs:
       - name: Build 🔨
         run: npm run build
 
-      - name: Download artifacts 🧩
+      - name: Upload artifacts 🧩
         uses: actions/upload-artifact@v3
         with:
           name: dist-files
@@ -49,10 +49,8 @@ jobs:
         with:
           draft: true
           files: |
-            dist/PdModal.js
-            dist/PdModal.js.map
-            dist/PdModal.min.js
-            dist/PdModal.min.js.map
+            dist/PdNaja.esm.js
+            dist/PdNaja.ems.js.map
 
   publish:
     name: Publish
