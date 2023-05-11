@@ -1,0 +1,50 @@
+{
+	"name": "@peckadesign/pd-naja",
+	"title": "PD Naja utils & extensions",
+	"version": "0.1.0",
+	"description": "Utilities and extensions created for use with Naja library.",
+	"module": "dist/PdNaja.esm.js",
+	"types": "dist/index.esm.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/peckadesign/pd-naja.git"
+	},
+	"keywords": [
+		"naja",
+		"extension",
+		"ajax",
+		"typescript",
+		"vanilla",
+		"javascript"
+	],
+	"author": {
+		"name": "PeckaDesign, s.r.o",
+		"email": "support@peckadesign.cz"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/peckadesign/pd-naja/issues"
+	},
+	"homepage": "https://github.com/peckadesign/pd-naja#readme",
+	"dependencies": {
+		"naja": "^2.5.0"
+	},
+	"scripts": {
+		"build": "NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"lint": "NODE_ENV=development eslint src --ext .ts --max-warnings=0"
+	},
+	"devDependencies": {
+		"@rollup/plugin-babel": "^6.0.3",
+		"@rollup/plugin-commonjs": "^24.1.0",
+		"@rollup/plugin-node-resolve": "^15.0.2",
+		"@rollup/plugin-typescript": "^11.1.0",
+		"@rushstack/eslint-patch": "^1.2.0",
+		"eslint": "^8.40.0",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-config-typescript": "^3.0.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"prettier": "^2.8.8",
+		"rollup": "^3.21.6",
+		"typescript": "^5.0.4"
+	}
+}
