@@ -15,6 +15,15 @@ declare module 'naja/dist/Naja' {
 	}
 }
 
+interface OptionsWithPdModal extends Options {
+	modalOpener: Element
+	modalOptions: any
+}
+
+interface PdModalHistoryState extends HistoryState {
+	pdModal: PdModalState
+}
+
 type CallbackFn = (callback: EventListener) => void
 
 export interface AjaxModal {
@@ -24,7 +33,7 @@ export interface AjaxModal {
 	// id's of snippets, that are necessary for modal function
 	reservedSnippetIds: string[]
 
-	show(opener: Element | undefined, options: any, event: BeforeEvent | PopStateEvent): void
+	show(opener: Element, options: any, event: BeforeEvent | PopStateEvent): void
 	hide(event: SuccessEvent | PopStateEvent): void
 	isShown(): boolean
 
@@ -46,6 +55,12 @@ interface HistoryStateWrapper extends Record<string, any> {
 
 type HistoryDirection = 'forwards' | 'backwards'
 
+interface PdModalState {
+	historyDirection: HistoryDirection
+	opener: string // stringified Element
+	options: any
+}
+
 export class AjaxModalExtension implements Extension {
 	private readonly modal: AjaxModal
 	private readonly uniqueExtKey: string = 'modal'
@@ -55,6 +70,8 @@ export class AjaxModalExtension implements Extension {
 
 	private historyEnabled = false // (dis)allows `pushState` after hiding the modal when going back in history (popstate), we don't want to push new state into history same is true also when the history is disabled for request altogether
 	private historyDirection: HistoryDirection = 'backwards'
+
+	private shouldPreventSnippetFetch = false
 
 	private modalOptions: any = {}
 
@@ -97,11 +114,15 @@ export class AjaxModalExtension implements Extension {
 		return options.history !== false
 	}
 
-	private isPdModalState = (state: HistoryState | Record<string, never>): boolean => {
-		return 'pdModal' in state && state.pdModal?.isShown
+	private isPdModalRequest = (options: Options): options is OptionsWithPdModal => {
+		return Boolean(options.pdModal)
 	}
 
-	private restoreExtensionPropertiesFromState = (state: HistoryState): void => {
+	private isPdModalState = (state: HistoryState | Record<string, never>): state is PdModalHistoryState => {
+		return 'pdModal' in state
+	}
+
+	private restoreExtensionPropertiesFromState = (state: PdModalHistoryState): void => {
 		this.historyEnabled = true // Called from popstateHandler means the history is enabled
 		this.historyDirection = state.pdModal.historyDirection
 		this.modalOptions = state.pdModal.options
@@ -115,9 +136,7 @@ export class AjaxModalExtension implements Extension {
 			element.hasAttribute('data-naja-modal') ||
 			(element as HTMLInputElement).form?.hasAttribute('data-naja-modal')
 
-		// If the extension is enabled and modal is not opened, we detect and store history mode. History mode cannot
-		// change when traversing ajax link inside modal.
-		if (!options.pdModal) {
+		if (!this.isPdModalRequest(options)) {
 			return
 		}
 
@@ -128,14 +147,29 @@ export class AjaxModalExtension implements Extension {
 		options.modalOptions = this.modalOptions
 		options.modalOpener = element
 
-		// History direction can only be set before opening the modal, then it stays the same until modal is hidden.
+		// If the extension is enabled and modal is not opened, we detect and store history mode. History mode cannot
+		// change when traversing ajax link inside modal, it stays the same until modal is hidden.
 		if (!this.modal.isShown()) {
 			this.historyDirection = element.getAttribute('data-naja-modal-history') === 'forwards' ? 'forwards' : 'backwards'
 		}
 	}
 
 	private onSnippetFetch(event: FetchEvent): void {
-		event.detail.options.pdModal = 'pdModal' in event.detail.state
+		// When snippet cache is off, this method is called to construct Naja request options. We retrieve modal
+		// `options` from original state in history if neccessary. Also, when closing the modal from `PopstateEvent`, we
+		// don't need to make a new request, so we call `event.preventDefault()` in that case.
+		const { state } = event.detail
+
+		if (this.isPdModalState(state)) {
+			event.detail.options.pdModal = true
+			event.detail.options.modalOpener = this.getElementFromString(state.pdModal.opener)
+			event.detail.options.modalOptions = state.pdModal.options
+		}
+
+		if (this.shouldPreventSnippetFetch) {
+			event.preventDefault()
+			this.shouldPreventSnippetFetch = false
+		}
 	}
 
 	private removeModalSnippetsIds(): void {
@@ -153,7 +187,7 @@ export class AjaxModalExtension implements Extension {
 
 	private abortPreviousRequest(event: StartEvent): void {
 		const { abortController, options } = event.detail
-		if (options.pdModal) {
+		if (this.isPdModalRequest(options)) {
 			this.abortControllers.get(this.uniqueExtKey)?.abort()
 			this.abortControllers.set(this.uniqueExtKey, abortController)
 		}
@@ -169,14 +203,21 @@ export class AjaxModalExtension implements Extension {
 	private buildState(event: BuildStateEvent): void {
 		const { options, state } = event.detail
 
-		// Every time naja builds the state, we extend it with `pdModal` object containing information about modal being
-		// opened and what history mode is in use. When options.forceRedirect is set, modal might be open but the new
-		// state will be redirected outside it.
+		// Every time naja builds the state, and we have the modal opened, we extend the state with `pdModal` object
+		// containing information about modal being opened and what history mode is in use. When `options.forceRedirect`
+		// is set, modal might be open but the new state will be redirected outside of it.
+		//
+		// We must check this.modal.isShown instead of this.isPdModalRequest, because of initial replace state from
+		// Naja - in that case, options already contains information about request to be made, but we have to build the
+		// "previous" state yet.
 		const isShown: boolean = this.modal.isShown() && !options.forceRedirect
-		state.pdModal = {
-			isShown,
-			historyDirection: isShown ? this.historyDirection : null,
-			options: isShown ? this.modalOptions : null
+
+		if (isShown) {
+			state.pdModal = {
+				historyDirection: this.historyDirection,
+				opener: (options.modalOpener as Element).outerHTML, // if `this.modal.isShown()` is true, the `modalOpener` has been stored
+				options: this.modalOptions
+			}
 		}
 
 		// If the state is build, the history is enabled. This information is needed inside modal callback where the
@@ -186,7 +227,7 @@ export class AjaxModalExtension implements Extension {
 
 	private before(event: BeforeEvent) {
 		const { options, request } = event.detail
-		if (!options.pdModal) {
+		if (!this.isPdModalRequest(options)) {
 			return
 		}
 
@@ -205,7 +246,7 @@ export class AjaxModalExtension implements Extension {
 			title: document.title
 		}
 
-		if (!options.pdModal) {
+		if (!this.isPdModalRequest(options)) {
 			return
 		}
 
@@ -300,6 +341,7 @@ export class AjaxModalExtension implements Extension {
 
 		const isCurrentStatePdModal = this.isPdModalState(state)
 		this.popstateFlag = true
+		this.shouldPreventSnippetFetch = false
 
 		// We don't know how many states we go back. So we go one by one until the new state is not modal state
 		// (`isPdModalState` is `false`).
@@ -321,17 +363,17 @@ export class AjaxModalExtension implements Extension {
 			this.hidePopstateFlag = false
 		}
 
-		// We check if the state has pdModal object present on popstate. If so (and the pdModal.isShown is true), we proceed
-		// to open the modal. Content of the modal is restored by naja itself (either from cache or by new request).
+		// We check if the state has `pdModal` object present on popstate. If so , we proceed to open the modal. Content
+		// of the modal is restored by naja itself (either from cache or by new request).
 		//
-		// If the initial state is also detected as pdModal state, we returned to some pdModal state using reload. In that
-		// case, we don't want to open the modal, because we might be missing some snippets. Effectively this means that the
-		// modal will never be opened by forward / back button if there has been some other site loaded outside the modal
-		// (e.g. some non-ajax link leading from modal).
+		// If the initial state is also detected as pdModal state, we returned to some pdModal state using reload. In
+		// that case, we don't want to open the modal, because we might be missing some snippets. Effectively this means
+		// that the modal will never be opened by forward / back button if there has been some other site loaded outside
+		// the modal (e.g. some non-ajax link leading from modal).
 		if (isCurrentStatePdModal && !this.isPdModalState(this.initialState)) {
 			this.restoreExtensionPropertiesFromState(state)
 
-			this.modal.show(undefined, state.pdModal.options, event)
+			this.modal.show(this.getElementFromString(state.pdModal.opener), state.pdModal.options, event)
 
 			// If there is some snippet cache, we might restore modal options. If not, options will be restored based on
 			// options after the ajax request. Same applies to dispatching load event - if cache is on, we dispatch the
@@ -346,16 +388,18 @@ export class AjaxModalExtension implements Extension {
 		} else {
 			this.historyEnabled = false // Hiding modal using forward / back button, we disable the history to prevent state duplication
 
-			// Reload the page if the initial state has been inside modal. This prevents snippets loss e.g. during layout changes.
+			// Reload the page if the initial state has been inside modal. This prevents snippets loss e.g. during
+			// layout changes.
 			if (this.isPdModalState(this.initialState)) {
 				window.location.reload()
 			}
 
-			// Non-modal state and non-modal initial state, we just hide the current modal.
-			this.modal.hide(event)
-
-			// We don't want the naja popstate callback to be executed (or any other popstate handler).
-			event.stopImmediatePropagation()
+			// Non-modal state and non-modal initial state → we just hide the current modal and prevent snippet fetch
+			// (if snippet cache is off).
+			if (this.modal.isShown()) {
+				this.modal.hide(event)
+				this.shouldPreventSnippetFetch = true
+			}
 		}
 
 		// Keep track of current state. When `backwards` history mode is used, we eventually push this state into
@@ -371,5 +415,9 @@ export class AjaxModalExtension implements Extension {
 		this.historyEnabled = false
 		this.historyDirection = 'backwards'
 		this.modalOptions = null
+	}
+
+	private getElementFromString(stringElement: string): Element {
+		return new DOMParser().parseFromString(stringElement, 'text/html').body.firstElementChild as Element
 	}
 }
