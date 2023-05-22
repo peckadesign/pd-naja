@@ -4,6 +4,7 @@
 	"version": "1.0.1",
 	"private": false,
 	"description": "Utilities and extensions created for use with Naja library.",
+	"main": "dist/PdNaja.esm.js",
 	"module": "dist/PdNaja.esm.js",
 	"types": "dist/index.esm.d.ts",
 	"repository": {
