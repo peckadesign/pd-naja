@@ -13,6 +13,10 @@
 // 3. In case of `addControlOnLive` used, the `initialize` method is also called for each success ajax request. The
 //    `context` argument is equal to modified nette snippet.
 //
+// There is also optional method `destroy`. This method is called for each snippet before its content is being replaced.
+// It is only called on snippets where operation is equal to naja.snippetHandler.
 export default interface Control {
 	initialize(context: Element | Document): void
+
+	destroy?(context: Element): void
 }
