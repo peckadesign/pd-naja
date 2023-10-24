@@ -40,7 +40,10 @@ This package provides easy ways to add JS components reactive to Naja ajax event
 
 2. The instantiated class is then added to ControlManager either by `addControlOnLoad` or `addControlOnLive`. This ensures, that on `DOMContentLoaded` the `initialize` function of class is called. This method should implement initialization of the control dependent on fully loaded DOM. The `context` argument is equal to `document` in this call.
 
-3. In case of `addControlOnLive` used, the `initialize` method is also called for each success ajax request. The `context` argument is equal to modified nette snippet.
+3. In the case of using `addControlOnLive`, two methods are called after each successful Ajax request:
+   1. **Optional:** Just before the snippet update, the optional `destroy` method is called. It will only be called if the [snippet update operation](https://naja.js.org/#/snippets?id=snippet-update-operation) is `replace`.
+
+   2. The `initialize` method is called for each snippet. It is called immediately after the snippet has been updated. The `context` argument is equal to the modified nette snippet.
 
 
 ## Extensions
@@ -70,6 +73,25 @@ naja.registerExtension(
 | `dispatchLoad?: (options: any, event: SuccessEvent \| PopStateEvent) => void`                                                                 | If you provide this method, extension will call it whenever the content is changed (loaded).                                                                                                                                                                                                                                                           |
 | `getOptions(opener: Element): any`                                                                                                            | If you need to change some modal settings based on opener element, you can do that in this function. Return value of this function is stored in `localStorage` (or wherever is Naja configured to store states) and also in `HistoryState`. Bear in mind that this introduces some limitations of what can be returned (e.g. no `Element` is allowed). | 
 | `setOptions(options: any): void`                                                                                                              | Counterpart of `getOptions` method, you can use this method to restore modal settings based on `options`.                                                                                                                                                                                                                                              |
+
+### `AjaxModalPreventRedrawExtension`
+Occasionally we may have an ajax request invoked inside the modal window, but this request is not related to the modal window itself. However, because it is invoked from within the modal window, the HTTP header `Pd-Modal-Opened` is set. If enabled, this extension adds another header to the request, namely `Pd-Modal-Prevent-Redraw`. The extension can be enabled by adding the `data-naja-modal-prevent-redraw` data attribute to the interacted element, or by adding `pdModalPreventRedraw` to options.
+
+
+### `AjaxOnceExtension`
+This extension allows you to specify for a given element that the request will only be made on the first interaction. For example, for collapsible boxes, it is possible to make the request only once, when they are expanded for the first time. It is enabled by setting `data-naja-once` on the interacted element and allows the same element to control the collapsible box and make a request at the same time, without creating multiple unnecessary requests.
+
+### `ConfirmExtension`
+Simple extension that uses `window.confirm` before making the request, allowing the user to prevent the request from being made. It is enabled by setting the data attribute `data-confirm`. The value of the attribute is used as a parameter for the `window.confirm` call.
+
+### `FollowUpRequestExtension`
+This extension allows you to chain multiple requests. This is useful, for example, within modals, where after redrawing the modal, you may need to redraw the page below it as well. This page may be from a different presenter, so you need to redraw with a different request. When used, this extension checks for the presence of `followUpUrl` in the payload. This is the URL to which the follow up request will be made.
+
+### `ForceRedirectExtension`
+This extension allows you to force redirect the page to a specific URL. When imported, it checks for the presence of `forceRedirect` in the payload and then redirects to it. 
+
+### `ForceReplaceExtension`
+If you are using content prepending or appending on snippets, you may need to force replace their content when certain elements have been interacted with. For example, if you have an infinite pager with new items appended, you may need to clear the snippet when some sort of filtering request has been made. This extension changes the snippet operation to `replace` when enabled by using the `data-naja-snippet-force-replace attribute` on the interacted element. See [Snippet update operation](https://naja.js.org/#/snippets?id=snippet-update-operation) in the Naja docs for more information about update operations.
 
 ### `SpinnerExtension`
 
