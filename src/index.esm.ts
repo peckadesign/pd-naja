@@ -7,6 +7,7 @@ export { ConfirmExtension } from './extensions/ConfirmExtension'
 export { FollowUpRequestExtension } from './extensions/FollowUpRequestExtension'
 export { ForceRedirectExtension } from './extensions/ForceRedirectExtension'
 export { ForceReplaceExtension } from './extensions/ForceReplaceExtension'
+export { SnippetFormPartExtension } from './extensions/SnippetFormPartExtension'
 export { SpinnerExtension } from './extensions/SpinnerExtension'
 
 export const controlManager = new ControlManager()

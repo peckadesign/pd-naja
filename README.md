@@ -93,6 +93,10 @@ This extension allows you to force redirect the page to a specific URL. When imp
 ### `ForceReplaceExtension`
 If you are using content prepending or appending on snippets, you may need to force replace their content when certain elements have been interacted with. For example, if you have an infinite pager with new items appended, you may need to clear the snippet when some sort of filtering request has been made. This extension changes the snippet operation to `replace` when enabled by using the `data-naja-snippet-force-replace attribute` on the interacted element. See [Snippet update operation](https://naja.js.org/#/snippets?id=snippet-update-operation) in the Naja docs for more information about update operations.
 
+
+### `SnippetFormPartExtension`
+By default, Naja and netteForms and pdForms expect the snippets to be outer wrappers of the form elements. Because of this, if the snippet is inside the form, the validations and nette toggles may not work properly. This extension simply calls the `Nette.initForm()` method for each form that contains a redrawn snippet. The method itself doesn't attach any handlers if the form has the `formnovalidate` attribute (which it sets itself on initialisation), but the toggles are initialised beforehand.
+
 ### `SpinnerExtension`
 
 This extension allows you to add configurable loading indicator to ajax request. Constructor recieves following 4 parameters:
