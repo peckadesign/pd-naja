@@ -10,4 +10,6 @@ export { ForceReplaceExtension } from './extensions/ForceReplaceExtension'
 export { SnippetFormPartExtension } from './extensions/SnippetFormPartExtension'
 export { SpinnerExtension } from './extensions/SpinnerExtension'
 
+export { isDatasetTruthy } from './utils'
+
 export const controlManager = new ControlManager()
