@@ -81,6 +81,20 @@ Occasionally we may have an ajax request invoked inside the modal window, but th
 ### `AjaxOnceExtension`
 This extension allows you to specify for a given element that the request will only be made on the first interaction. For example, for collapsible boxes, it is possible to make the request only once, when they are expanded for the first time. It is enabled by setting `data-naja-once` on the interacted element and allows the same element to control the collapsible box and make a request at the same time, without creating multiple unnecessary requests.
 
+### `BtnSpinnerExtension`
+Extension that allows you to add a spinner element to a certain button. In some cases, the overlay spinner for an area might not be neccessary and overlaying only the button might be sufficient. To use this extension, you have to add a data atributte data-naja-btn-spinner to the button element or data-naja-spinner="btn". In the latter case, the [SpinnerExtension](#spinnerextension) is also disabled automatically.
+
+When loaded, the extension also automatically adds button spinners to all non-ajax forms. This can be disabled on a per-button basis by setting `data-no-spinner` or `data-no-btn-spinner` on the button element.
+
+The extension constructor receives 3 parameters:
+
+| Parameter                                                                | Description                                                                                                                                                             |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `spinner: ((props?: any) => Element) \| Element`                         | Mandatory parameter. It should either be function return the spinner element, or directly element.                                                                      |
+| `getSpinnerProps: ((initator: Element) => any) \| undefined = undefined` | If you provide `spinner` as a function, you might also provide function to get settings from ajax initiator. Returned value is passed as a `props` to `spinner()` call. |
+| `timeout: number = 60000`                                                | Timeout in milliseconds after which the spinner is removed for non-ajax forms. Ajax forms will use the Naja / Request API timeout (if there is one).                    |
+
+
 ### `ConfirmExtension`
 Simple extension that uses `window.confirm` before making the request, allowing the user to prevent the request from being made. It is enabled by setting the data attribute `data-confirm`. The value of the attribute is used as a parameter for the `window.confirm` call.
 
