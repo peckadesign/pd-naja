@@ -4,7 +4,16 @@
 2. [Utilities](#utilities)
 3. [Extensions](#extensions)
    1. [AjaxModalExtension](#ajaxmodalextension)
-   2. [SpinnerExtension](#spinnerextension)
+   2. [AjaxModalPreventRedrawExtension](#ajaxmodalpreventredrawextension)
+   3. [AjaxOnceExtension](#ajaxonceextension)
+   4. [BtnSpinnerExtension](#btnspinnerextension)
+   5. [ConfirmExtension](#confirmextension)
+   6. [FollowUpRequestExtension](#followuprequestextension)
+   7. [ForceRedirectExtension](#forceredirectextension)
+   8. [ForceReplaceExtension](#forcereplaceextension)
+   9. [SingleSubmitExtension](#singlesubmitextension)
+   10. [SnippetFormPartExtension](#snippetformpartextension)
+   11. [SpinnerExtension](#spinnerextension)
 
 ## Quick start
 ```
@@ -107,6 +116,15 @@ This extension allows you to force redirect the page to a specific URL. When imp
 ### `ForceReplaceExtension`
 If you are using content prepending or appending on snippets, you may need to force replace their content when certain elements have been interacted with. For example, if you have an infinite pager with new items appended, you may need to clear the snippet when some sort of filtering request has been made. This extension changes the snippet operation to `replace` when enabled by using the `data-naja-snippet-force-replace attribute` on the interacted element. See [Snippet update operation](https://naja.js.org/#/snippets?id=snippet-update-operation) in the Naja docs for more information about update operations.
 
+### `SingleSubmitExtension`
+Most of the time it is desirable to allow only single form submissions and prevent duplicate submissions, e.g. by double-clicking a button. This extension disables all buttons within a form on submission. It also works for non-ajax forms where there is a timeout after which the buttons are re-enabled. This extension is enabled by default for all forms, but can be disabled by setting a data attribute `data-naja-single-submit="off"`.
+
+There are 2 parameters passed to the constructor:
+
+| Parameter                      | Description                                                                                                                                                             |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `buttonDisabledClass?: string` | Class name added to the buttons disabled by this extension. Defaults to null.                                                                                           |
+| `timeout: number = 60000`      | Timeout in milliseconds after which the spinner is removed for non-ajax forms. Ajax forms will use the Naja / Request API timeout (if there is one). |
 
 ### `SnippetFormPartExtension`
 By default, Naja and netteForms and pdForms expect the snippets to be outer wrappers of the form elements. Because of this, if the snippet is inside the form, the validations and nette toggles may not work properly. This extension simply calls the `Nette.initForm()` method for each form that contains a redrawn snippet. The method itself doesn't attach any handlers if the form has the `formnovalidate` attribute (which it sets itself on initialisation), but the toggles are initialised beforehand.
