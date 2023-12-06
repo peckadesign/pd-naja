@@ -4,7 +4,16 @@
 2. [Utilities](#utilities)
 3. [Extensions](#extensions)
    1. [AjaxModalExtension](#ajaxmodalextension)
-   2. [SpinnerExtension](#spinnerextension)
+   2. [AjaxModalPreventRedrawExtension](#ajaxmodalpreventredrawextension)
+   3. [AjaxOnceExtension](#ajaxonceextension)
+   4. [BtnSpinnerExtension](#btnspinnerextension)
+   5. [ConfirmExtension](#confirmextension)
+   6. [FollowUpRequestExtension](#followuprequestextension)
+   7. [ForceRedirectExtension](#forceredirectextension)
+   8. [ForceReplaceExtension](#forcereplaceextension)
+   9. [SingleSubmitExtension](#singlesubmitextension)
+   10. [SnippetFormPartExtension](#snippetformpartextension)
+   11. [SpinnerExtension](#spinnerextension)
 
 ## Quick start
 ```
@@ -81,6 +90,20 @@ Occasionally we may have an ajax request invoked inside the modal window, but th
 ### `AjaxOnceExtension`
 This extension allows you to specify for a given element that the request will only be made on the first interaction. For example, for collapsible boxes, it is possible to make the request only once, when they are expanded for the first time. It is enabled by setting `data-naja-once` on the interacted element and allows the same element to control the collapsible box and make a request at the same time, without creating multiple unnecessary requests.
 
+### `BtnSpinnerExtension`
+Extension that allows you to add a spinner element to a certain button. In some cases, the overlay spinner for an area might not be neccessary and overlaying only the button might be sufficient. To use this extension, you have to add a data atributte data-naja-btn-spinner to the button element or data-naja-spinner="btn". In the latter case, the [SpinnerExtension](#spinnerextension) is also disabled automatically.
+
+When loaded, the extension also automatically adds button spinners to all non-ajax forms. This can be disabled on a per-button basis by setting `data-no-spinner` or `data-no-btn-spinner` on the button element.
+
+The extension constructor receives 3 parameters:
+
+| Parameter                                                                | Description                                                                                                                                                             |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `spinner: ((props?: any) => Element) \| Element`                         | Mandatory parameter. It should either be function return the spinner element, or directly element.                                                                      |
+| `getSpinnerProps: ((initator: Element) => any) \| undefined = undefined` | If you provide `spinner` as a function, you might also provide function to get settings from ajax initiator. Returned value is passed as a `props` to `spinner()` call. |
+| `timeout: number = 60000`                                                | Timeout in milliseconds after which the spinner is removed for non-ajax forms. Ajax forms will use the Naja / Request API timeout (if there is one).                    |
+
+
 ### `ConfirmExtension`
 Simple extension that uses `window.confirm` before making the request, allowing the user to prevent the request from being made. It is enabled by setting the data attribute `data-confirm`. The value of the attribute is used as a parameter for the `window.confirm` call.
 
@@ -93,6 +116,15 @@ This extension allows you to force redirect the page to a specific URL. When imp
 ### `ForceReplaceExtension`
 If you are using content prepending or appending on snippets, you may need to force replace their content when certain elements have been interacted with. For example, if you have an infinite pager with new items appended, you may need to clear the snippet when some sort of filtering request has been made. This extension changes the snippet operation to `replace` when enabled by using the `data-naja-snippet-force-replace attribute` on the interacted element. See [Snippet update operation](https://naja.js.org/#/snippets?id=snippet-update-operation) in the Naja docs for more information about update operations.
 
+### `SingleSubmitExtension`
+Most of the time it is desirable to allow only single form submissions and prevent duplicate submissions, e.g. by double-clicking a button. This extension disables all buttons within a form on submission. It also works for non-ajax forms where there is a timeout after which the buttons are re-enabled. This extension is enabled by default for all forms, but can be disabled by setting a data attribute `data-naja-single-submit="off"`.
+
+There are 2 parameters passed to the constructor:
+
+| Parameter                      | Description                                                                                                                                                             |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `buttonDisabledClass?: string` | Class name added to the buttons disabled by this extension. Defaults to null.                                                                                           |
+| `timeout: number = 60000`      | Timeout in milliseconds after which the spinner is removed for non-ajax forms. Ajax forms will use the Naja / Request API timeout (if there is one). |
 
 ### `SnippetFormPartExtension`
 By default, Naja and netteForms and pdForms expect the snippets to be outer wrappers of the form elements. Because of this, if the snippet is inside the form, the validations and nette toggles may not work properly. This extension simply calls the `Nette.initForm()` method for each form that contains a redrawn snippet. The method itself doesn't attach any handlers if the form has the `formnovalidate` attribute (which it sets itself on initialisation), but the toggles are initialised beforehand.
@@ -109,7 +141,8 @@ This extension allows you to add configurable loading indicator to ajax request.
 |`ajaxSpinnerPlaceholderSelector = '.ajax-spinner'`| See below                                                                                                                                                               |
 
 The logic for spinner placeholder is as follows:
-1. Extension can be turned off by using `data-naja-spinner="off"`.
+1. The extension can be disabled by using `data-naja-spinner="off"`.
+3. The extension is also disabled if `data-naja-spinner="btn"` is set. In this case the spinner rendering is up to [`BtnSpinnerExtension`](#btnspinnerextension), which will be enabled automatically.
 2. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the spinner element is appended.
 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
    1. If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
