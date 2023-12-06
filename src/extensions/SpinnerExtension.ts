@@ -5,9 +5,12 @@ import { InteractionEvent } from 'naja/dist/core/UIHandler'
  * @author Radek Šerý
  *
  * Spinner - loading indicator:
- * 1. Extension can be turned off by using `data-naja-spinner="off"`.
- * 2. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the spinner element is appended.
- * 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
+ * 1. The extension can be disabled by using `data-naja-spinner="off"`.
+ * 2. The extension is also disabled if `data-naja-spinner="btn"` is set. In this case the spinner rendering is up to
+ *    `BtnSpinnerExtension`, which will be enabled automatically.
+ * 3. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the
+ *    spinner element is appended.
+ * 4. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
  *    i.  If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
  *    ii. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
  */
@@ -105,7 +108,7 @@ export class SpinnerExtension implements Extension {
 		const spinner = element.getAttribute('data-naja-spinner') || null
 		let placeholders: Element[] = []
 
-		if (spinner === 'off') {
+		if (spinner === 'off' || spinner === 'false' || spinner === 'btn') {
 			return []
 		}
 

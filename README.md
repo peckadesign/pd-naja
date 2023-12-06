@@ -141,7 +141,8 @@ This extension allows you to add configurable loading indicator to ajax request.
 |`ajaxSpinnerPlaceholderSelector = '.ajax-spinner'`| See below                                                                                                                                                               |
 
 The logic for spinner placeholder is as follows:
-1. Extension can be turned off by using `data-naja-spinner="off"`.
+1. The extension can be disabled by using `data-naja-spinner="off"`.
+3. The extension is also disabled if `data-naja-spinner="btn"` is set. In this case the spinner rendering is up to [`BtnSpinnerExtension`](#btnspinnerextension), which will be enabled automatically.
 2. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the spinner element is appended.
 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
    1. If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
