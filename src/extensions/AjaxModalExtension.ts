@@ -115,7 +115,7 @@ export class AjaxModalExtension implements Extension {
 	}
 
 	private isPdModalRequest = (options: Options): options is OptionsWithPdModal => {
-		return Boolean(options.pdModal)
+		return Boolean(options.pdModal) && !options.pdModalPreventRedraw
 	}
 
 	private isPdModalState = (state: HistoryState | Record<string, never>): state is PdModalHistoryState => {
