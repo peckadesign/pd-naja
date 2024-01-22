@@ -8,9 +8,11 @@ export { ConfirmExtension } from './extensions/ConfirmExtension'
 export { FollowUpRequestExtension } from './extensions/FollowUpRequestExtension'
 export { ForceRedirectExtension } from './extensions/ForceRedirectExtension'
 export { ForceReplaceExtension } from './extensions/ForceReplaceExtension'
+export { ScrollToExtension } from './extensions/ScrollToExtension'
 export { SingleSubmitExtension } from './extensions/SingleSubmitExtension'
 export { SnippetFormPartExtension } from './extensions/SnippetFormPartExtension'
 export { SpinnerExtension } from './extensions/SpinnerExtension'
+export { ToggleClassExtension } from './extensions/ToggleClassExtension'
 
 export { isDatasetTruthy, isDatasetFalsy } from './utils'
 
