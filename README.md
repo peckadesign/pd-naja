@@ -150,3 +150,18 @@ The logic for spinner placeholder is as follows:
 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
    1. If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
    2. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
+
+### `ToggleClassExtension`
+
+With this extension you can change the classes on the interacted element immediately at the start of the request. You can use it for example to mark the active element before the ajax finishes. If the request fails with an error (including user interruption), the classes will be reset to the previous state. You can specify the classes to toggle using the data attribute `data-naja-toggle-class`. This attribute expects a JSON object where keys are selectors (used as parameter for the `querySelectorAll` called on the interacted element) and values are class names to be changed. The extension uses the [`toggle()`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle) function, so it can also remove classes from the element. If you need to change the classes on the interacted element itself, you can use selector `:scope > *`. For example:
+```html
+<a … data-naja-toggle-class='{
+       ":scope > *": "active",
+       "img": "shadow rounded-full"
+   }'>
+	<img … class="shadow">
+	…
+</a>
+```
+
+This configuration would add the `active` class to the anchor element and the `rounded-full` class to the image. It would also remove the `shadow` class from the image as it was already present.
