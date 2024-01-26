@@ -1,6 +1,7 @@
 import { InteractionEvent } from 'naja/dist/core/UIHandler'
 import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
-import { isDatasetTruthy } from '../utils'
+import { SpinnerPropsFn, SpinnerType, WithSpinner } from '../types'
+import { hideSpinner, isDatasetTruthy, showSpinner } from '../utils'
 
 declare module 'naja/dist/Naja' {
 	interface Options {
@@ -9,15 +10,12 @@ declare module 'naja/dist/Naja' {
 	}
 }
 
-type spinnerType = ((props?: any) => Element) | Element
-type spinnerPropsFn = ((initiator: Element) => any) | undefined
-
-export class BtnSpinnerExtension implements Extension {
+export class BtnSpinnerExtension implements Extension, WithSpinner {
 	public readonly timeout: number
-	public readonly spinner: spinnerType
-	public readonly getSpinnerProps?: spinnerPropsFn
+	public readonly spinner: SpinnerType
+	public readonly getSpinnerProps: SpinnerPropsFn
 
-	public constructor(spinner: spinnerType, getSpinnerProps: spinnerPropsFn = undefined, timeout = 60000) {
+	public constructor(spinner: SpinnerType, getSpinnerProps: SpinnerPropsFn = undefined, timeout = 60000) {
 		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
 		this.timeout = timeout
@@ -36,11 +34,11 @@ export class BtnSpinnerExtension implements Extension {
 				return true
 			}
 
-			const spinner = this.showSpinner(button)
+			const spinner = showSpinner.call(this, button)
 
 			form.dataset.btnSpinnerTimeout = String(
 				setTimeout(() => {
-					this.hideSpinner(spinner)
+					hideSpinner(spinner)
 					delete form.dataset.btnSpinnerTimeout
 				}, this.timeout)
 			)
@@ -70,7 +68,7 @@ export class BtnSpinnerExtension implements Extension {
 			return
 		}
 
-		options.btnSpinner = this.showSpinner(options.btnSpinnerInitiator)
+		options.btnSpinner = showSpinner.call(this, options.btnSpinnerInitiator)
 	}
 
 	private handleCompleteEvent(event: CompleteEvent): void {
@@ -80,26 +78,6 @@ export class BtnSpinnerExtension implements Extension {
 			return
 		}
 
-		this.hideSpinner(options.btnSpinner)
-	}
-
-	private showSpinner(button: Element): Element {
-		let spinner: Element
-
-		if (typeof this.spinner === 'function') {
-			spinner = this.getSpinnerProps ? this.spinner(this.getSpinnerProps(button)) : this.spinner()
-		} else {
-			spinner = this.spinner
-		}
-
-		button.appendChild(spinner)
-		spinner.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 100 })
-
-		return spinner
-	}
-
-	private hideSpinner(spinner: Element): void {
-		const animation = spinner.animate({ opacity: 0 }, { duration: 100 })
-		animation.finished.then(() => spinner?.remove())
+		hideSpinner(options.btnSpinner)
 	}
 }
