@@ -1,3 +1,11 @@
+export type SpinnerType = ((props?: any) => Element) | Element
+export type SpinnerPropsFn = ((initiator: Element) => any) | undefined
+
+export interface WithSpinner {
+	spinner: SpinnerType
+	getSpinnerProps: SpinnerPropsFn
+}
+
 // `Control` is meant to be used for standalone components, that might be dependent on ajax. It should be used together
 // with ControlManager. Class implementing the `Control` interface should export its instance. Then the intended
 // lifecycle of class is as follows:

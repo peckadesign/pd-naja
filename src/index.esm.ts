@@ -14,4 +14,4 @@ export { SnippetFormPartExtension } from './extensions/SnippetFormPartExtension'
 export { SpinnerExtension } from './extensions/SpinnerExtension'
 export { ToggleClassExtension } from './extensions/ToggleClassExtension'
 
-export { isDatasetTruthy, isDatasetFalsy } from './utils'
+export { isDatasetFalsy, isDatasetTruthy, showSpinner, hideSpinner } from './utils'

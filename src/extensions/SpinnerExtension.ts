@@ -1,5 +1,7 @@
 import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
 import { InteractionEvent } from 'naja/dist/core/UIHandler'
+import { SpinnerPropsFn, SpinnerType, WithSpinner } from '../types'
+import { hideSpinner, showSpinner } from '../utils'
 
 /**
  * @author Radek Šerý
@@ -21,19 +23,16 @@ declare module 'naja/dist/Naja' {
 	}
 }
 
-type spinnerType = ((props?: any) => Element) | Element
-type spinnerPropsFn = ((initiator: Element) => any) | undefined
-
-export class SpinnerExtension implements Extension {
-	public readonly spinner: spinnerType
-	public readonly getSpinnerProps?: spinnerPropsFn
+export class SpinnerExtension implements Extension, WithSpinner {
+	public readonly spinner: SpinnerType
+	public readonly getSpinnerProps: SpinnerPropsFn
 
 	public readonly ajaxSpinnerWrapSelector: string
 	public readonly ajaxSpinnerPlaceholderSelector: string
 
 	public constructor(
-		spinner: spinnerType,
-		getSpinnerProps: spinnerPropsFn = undefined,
+		spinner: SpinnerType,
+		getSpinnerProps: SpinnerPropsFn = undefined,
 		ajaxSpinnerWrapSelector = '.ajax-wrap',
 		ajaxSpinnerPlaceholderSelector = '.ajax-spinner'
 	) {
@@ -71,18 +70,7 @@ export class SpinnerExtension implements Extension {
 			options.spinnerQueue = options.spinnerQueue || []
 
 			placeholders.forEach((placeholder) => {
-				let spinner: Element
-
-				if (typeof this.spinner === 'function') {
-					spinner = this.getSpinnerProps ? this.spinner(this.getSpinnerProps(spinnerInitiator)) : this.spinner()
-				} else {
-					spinner = this.spinner
-				}
-
-				placeholder.appendChild(spinner)
-				options.spinnerQueue.push(spinner)
-
-				spinner.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 100 })
+				options.spinnerQueue.push(showSpinner.call(this, placeholder, spinnerInitiator))
 			})
 		}
 	}
@@ -94,10 +82,7 @@ export class SpinnerExtension implements Extension {
 			return
 		}
 
-		options.spinnerQueue?.forEach((spinner: Element) => {
-			const animation = spinner.animate({ opacity: 0 }, { duration: 100 })
-			animation.finished.then(() => spinner.remove())
-		})
+		options.spinnerQueue?.forEach((spinner: Element) => hideSpinner(spinner))
 	}
 
 	private getPlaceholders(element: Element): Element[] {
