@@ -1,19 +1,21 @@
-import naja from 'naja'
 import { AfterUpdateEvent, BeforeUpdateEvent } from 'naja/dist/core/SnippetHandler'
-import Control from './Control'
+import { Naja } from 'naja/dist/Naja'
+import { Control } from '../types'
 
 let instance: ControlManager | null = null
 
-export default class ControlManager {
+export class ControlManager {
+	private naja!: Naja
 	private onLoadControl: Control[] = []
 	private onLiveControl: Control[] = []
 
-	public constructor() {
+	public constructor(naja: Naja) {
 		if (instance === null) {
 			// eslint-disable-next-line @typescript-eslint/no-this-alias
 			instance = this
-			naja.snippetHandler.addEventListener('beforeUpdate', this.onBeforeSnippetUpdate.bind(this))
-			naja.snippetHandler.addEventListener('afterUpdate', this.onSnippetUpdate.bind(this))
+			this.naja = naja
+			this.naja.snippetHandler.addEventListener('beforeUpdate', this.onBeforeSnippetUpdate.bind(this))
+			this.naja.snippetHandler.addEventListener('afterUpdate', this.onSnippetUpdate.bind(this))
 		}
 		return instance
 	}
@@ -25,8 +27,8 @@ export default class ControlManager {
 
 	private onBeforeSnippetUpdate(event: BeforeUpdateEvent): void {
 		if (
-			event.detail.operation === naja.snippetHandler.op.append ||
-			event.detail.operation === naja.snippetHandler.op.prepend
+			event.detail.operation === this.naja.snippetHandler.op.append ||
+			event.detail.operation === this.naja.snippetHandler.op.prepend
 		) {
 			return
 		}

@@ -16,8 +16,7 @@
 //
 //    2. The `initialize` method is called for each snippet. It is called immediately after the snippet has been
 //       updated. The `context` argument is equal to the modified nette snippet.
-
-export default interface Control {
+export interface Control {
 	initialize(context: Element | Document): void
 
 	destroy?(context: Element): void

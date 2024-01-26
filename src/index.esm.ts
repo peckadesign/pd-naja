@@ -1,4 +1,4 @@
-import ControlManager from './utils/ControlManager'
+export { ControlManager } from './classes/ControlManager'
 
 export { AjaxModalExtension } from './extensions/AjaxModalExtension'
 export { AjaxModalPreventRedrawExtension } from './extensions/AjaxModalPreventRedrawExtension'
@@ -15,5 +15,3 @@ export { SpinnerExtension } from './extensions/SpinnerExtension'
 export { ToggleClassExtension } from './extensions/ToggleClassExtension'
 
 export { isDatasetTruthy, isDatasetFalsy } from './utils'
-
-export const controlManager = new ControlManager()
