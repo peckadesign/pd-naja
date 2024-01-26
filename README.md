@@ -14,6 +14,8 @@
    9. [SingleSubmitExtension](#singlesubmitextension)
    10. [SnippetFormPartExtension](#snippetformpartextension)
    11. [SpinnerExtension](#spinnerextension)
+   12. [SuggestExtension](#suggestextensions)
+   13. [ToggleClassExtension](#toggleclassextension)
 
 ## Quick start
 ```
@@ -150,6 +152,20 @@ The logic for spinner placeholder is as follows:
 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
    1. If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
    2. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
+
+
+### `SuggestExtensions`
+This extension allows you to implement a suggestion box. It uses a form element with a dedicated suggestion button to submit the form using ajax. The result of the request is expected to be the redrawing of the snippet with results. See below for a detailed description of the elements. The extension constructor takes optional spinner and getSpinnerProps parameters of the same type as described in the [`SpinnerExtensions`](#spinnerextension) and [`BtnSpinnerExtension`](#btnspinnerextension).
+
+At a minimum, these HTML elements are expected for the extension to work:
+
+| Selector             | Element type                             | Description                                                                                                                                                                                                                       |
+|----------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.js-suggest`          | `HTMLFormElement`                        | The form element for the suggest extension.                                                                                                                                                                                       |
+| `.js-suggest__input`   | `HTMLInputElement`                       | Input element whose value is used as a query parameter in a suggestion request.                                                                                                                                                   |
+| `.js-suggest__btn`     | `HTMLButtonElement \| HTMLInputElement` | Button used for form submission to suggestion request.                                                                                                                                                                            |
+| `.js-suggest__suggest` | `HTMLElement`                              | The snippet element where the results are displayed. If there are no children elements, the extension adds a class `js-suggest__suggest--empty`. If the element should be shown, the class `js-suggest__suggest--shown` is added. |
+| `.js-suggest__link`    | `HTMLAnchorElement`                        | Elements with this class are accessible using the keyboard arrows. Every result should have this class. When the anchor element is activated by keyboard interaction, it receives the class `js-suggest__link--active`.           |
 
 ### `ToggleClassExtension`
 
