@@ -1,0 +1,32 @@
+import { Extension, Naja } from 'naja/dist/Naja'
+import { BeforeUpdateEvent } from 'naja/dist/core/SnippetHandler'
+
+type SnippetUpdateOperation = (snippet: Element, content: string) => void
+
+export class ViewTransitionExtension implements Extension {
+	private operation: SnippetUpdateOperation | undefined
+
+	public initialize(naja: Naja): void {
+		naja.snippetHandler.addEventListener('beforeUpdate', this.handleBeforeUpdate.bind(this))
+	}
+
+	private handleBeforeUpdate(event: BeforeUpdateEvent): void {
+		const { operation, changeOperation } = event.detail
+
+		if (document.startViewTransition !== undefined) {
+			this.operation = operation
+			changeOperation(this.replace.bind(this))
+		}
+	}
+
+	public replace(snippet: Element, content: string): ViewTransition {
+		return document.startViewTransition(() => {
+			if (!this.operation) {
+				return
+			}
+
+			this.operation(snippet, content)
+			this.operation = undefined
+		})
+	}
+}
