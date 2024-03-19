@@ -51,7 +51,8 @@ export class ToggleClassExtension implements Extension {
 
 	private applyToggleClass(toggleClassOptions: ToggleClassOptions): void {
 		for (const [selector, classNames] of Object.entries(toggleClassOptions.toggleClass)) {
-			const targets = toggleClassOptions.element.querySelectorAll(selector)
+			const targets =
+				selector === ':self' ? [toggleClassOptions.element] : toggleClassOptions.element.querySelectorAll(selector)
 
 			targets.forEach((target) => {
 				classNames.split(' ').forEach((className) => target.classList.toggle(className))
