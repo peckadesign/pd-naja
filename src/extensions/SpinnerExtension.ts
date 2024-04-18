@@ -28,7 +28,7 @@ export class SpinnerExtension implements Extension, WithSpinner {
 	public readonly getSpinnerProps: SpinnerPropsFn
 
 	public readonly ajaxSpinnerWrapSelector: string
-	public readonly ajaxSpinnerPlaceholderSelector: string
+	public readonly ajaxSpinnerTargetSelector: string
 
 	public constructor(
 		spinner: SpinnerType,
@@ -40,7 +40,7 @@ export class SpinnerExtension implements Extension, WithSpinner {
 		this.getSpinnerProps = getSpinnerProps
 
 		this.ajaxSpinnerWrapSelector = ajaxSpinnerWrapSelector
-		this.ajaxSpinnerPlaceholderSelector = ajaxSpinnerPlaceholderSelector
+		this.ajaxSpinnerTargetSelector = ajaxSpinnerPlaceholderSelector
 	}
 
 	public initialize(naja: Naja): void {
@@ -62,7 +62,7 @@ export class SpinnerExtension implements Extension, WithSpinner {
 		}
 
 		const spinnerInitiator = options.spinnerInitiator
-		const placeholders = this.getPlaceholders(spinnerInitiator)
+		const placeholders = this.getTargets(spinnerInitiator)
 
 		if (placeholders.length === 0) {
 			return
@@ -85,7 +85,7 @@ export class SpinnerExtension implements Extension, WithSpinner {
 		options.spinnerQueue?.forEach((spinner: Element) => hideSpinner(spinner))
 	}
 
-	private getPlaceholders(element: Element): Element[] {
+	private getTargets(element: Element): Element[] {
 		if (!element) {
 			return []
 		}
@@ -97,23 +97,23 @@ export class SpinnerExtension implements Extension, WithSpinner {
 			return []
 		}
 
-		placeholders = this.getPlaceholdersByQuerySelector(spinner)
+		placeholders = this.getTargetsByQuerySelector(spinner)
 
-		return placeholders.length ? placeholders : this.getPlaceholdersByDOM(element)
+		return placeholders.length ? placeholders : this.getTargetsByDOM(element)
 	}
 
-	private getPlaceholdersByQuerySelector(selector: string | null): Element[] {
+	private getTargetsByQuerySelector(selector: string | null): Element[] {
 		return selector ? Array.from(document.querySelectorAll(selector)) : []
 	}
 
-	private getPlaceholdersByDOM(element: Element): Element[] {
+	public getTargetsByDOM(element: Element): Element[] {
 		const wrap = element.closest(this.ajaxSpinnerWrapSelector)
 
 		if (wrap === null) {
 			return []
 		}
 
-		const placeholders = wrap.querySelectorAll(this.ajaxSpinnerPlaceholderSelector)
+		const placeholders = wrap.querySelectorAll(this.ajaxSpinnerTargetSelector)
 
 		return placeholders.length ? Array.from(placeholders) : [wrap]
 	}

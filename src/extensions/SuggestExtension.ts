@@ -1,7 +1,8 @@
 import { InteractionEvent } from 'naja/dist/core/UIHandler'
 import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
-import { Suggest } from '../classes/Suggest'
+import { Suggest, SuggestOptions } from '../classes/Suggest'
 import { SpinnerPropsFn, SpinnerType } from '../types'
+import { SpinnerExtension } from './SpinnerExtension'
 
 declare module 'naja/dist/Naja' {
 	interface Options {
@@ -12,17 +13,25 @@ declare module 'naja/dist/Naja' {
 export class SuggestExtension implements Extension {
 	private requestQueue: Set<Request> = new Set()
 
+	public readonly spinnerExtension: SpinnerExtension | undefined
 	public readonly spinner: SpinnerType | undefined
-	public readonly getSpinnerProps?: SpinnerPropsFn
+	public readonly getSpinnerProps: SpinnerPropsFn | undefined
 
-	public constructor(spinner: SpinnerType | undefined = undefined, getSpinnerProps: SpinnerPropsFn = undefined) {
+	public constructor(
+		spinnerExtension: SpinnerExtension | undefined = undefined,
+		spinner: SpinnerType | undefined = undefined,
+		getSpinnerProps: SpinnerPropsFn = undefined
+	) {
+		this.spinnerExtension = spinnerExtension
 		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
 
 		const forms = document.querySelectorAll<HTMLFormElement>(`.${Suggest.className}`)
 
 		forms.forEach((form) => {
-			new Suggest(form, {}, spinner, getSpinnerProps)
+			const options = JSON.parse(form.dataset.suggest || '{}') as Partial<SuggestOptions>
+
+			new Suggest(form, options, spinnerExtension, spinner, getSpinnerProps)
 		})
 	}
 

@@ -142,26 +142,28 @@ This extension allows you to add configurable loading indicator to ajax request.
 |--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `spinner: ((props?: any) => Element) \| Element`                         | Mandatory parameter. It should either be function return the spinner element, or directly element.                                                                      |
 | `getSpinnerProps: ((initator: Element) => any) \| undefined = undefined` | If you provide `spinner` as a function, you might also provide function to get settings from ajax initiator. Returned value is passed as a `props` to `spinner()` call. |
-| `ajaxSpinnerWrapSelector = '.ajax-wrap'`  | See below.                                                                                                                                                              |
-|`ajaxSpinnerPlaceholderSelector = '.ajax-spinner'`| See below                                                                                                                                                               |
+| `ajaxSpinnerWrapSelector = '.ajax-wrap'`                                 | See below.                                                                                                                                                              |
+| `ajaxSpinnerTargetSelector = '.ajax-spinner'`                            | See below                                                                                                                                                               |
 
-The logic for spinner placeholder is as follows:
+The logic for spinner target is as follows:
 1. The extension can be disabled by using `data-naja-spinner="off"`.
 3. The extension is also disabled if `data-naja-spinner="btn"` is set. In this case the spinner rendering is up to [`BtnSpinnerExtension`](#btnspinnerextension), which will be enabled automatically.
 2. If there is `data-naja-spinner` with different value, this value is used as a selector for element into which the spinner element is appended.
 3. If there is no `data-naja-spinner`, closest `ajaxSpinnerWrapSelector` is being searched for and:
-   1. If there is `ajaxSpinnerPlaceholderSelector` inside, this element is used for placing spinner element.
+   1. If there is `ajaxSpinnerTargetSelector` inside, this element is used as a target for placing spinner element.
    2. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
 
 
 ### `SuggestExtensions`
-This extension allows you to implement a suggestion box. It uses a form element with a dedicated suggestion button to submit the form using ajax. The result of the request is expected to be the redrawing of the snippet with results. See below for a detailed description of the elements. The extension constructor takes optional spinner and getSpinnerProps parameters of the same type as described in the [`SpinnerExtensions`](#spinnerextension) and [`BtnSpinnerExtension`](#btnspinnerextension).
+This extension allows you to implement a suggestion box. It uses a form element with a dedicated suggestion button to submit the form using ajax. The result of the request is expected to be the redrawing of the snippet with results. See below for a detailed description of the elements. The extension constructor takes optional an `spinnerExtension: SpinnerExtension`, `spinner` and `getSpinnerProps` parameters, the types of the latter two parameters are described in the [`SpinnerExtension`](#spinnerextension) and [`BtnSpinnerExtension`](#btnspinnerextension).
+
+If the `spinnerExtension` is passed and the latter two are omitted, they are set by the passed extension instance. In addition, the target element for the spinner is determined as in the `SpinnerExtension` algorithm (4). The fallback target is always the form element.
 
 At a minimum, these HTML elements are expected for the extension to work:
 
 | Selector             | Element type                             | Description                                                                                                                                                                                                                       |
 |----------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `.js-suggest`          | `HTMLFormElement`                        | The form element for the suggest extension.                                                                                                                                                                                       |
+| `.js-suggest`          | `HTMLFormElement`                        | The form element for the suggest extension. The form element can have a `data-suggest` parameter with a Suggest configuration object. See the `type SuggestOptions` in `Suggest.ts` for more information.                      |
 | `.js-suggest__input`   | `HTMLInputElement`                       | Input element whose value is used as a query parameter in a suggestion request.                                                                                                                                                   |
 | `.js-suggest__btn`     | `HTMLButtonElement \| HTMLInputElement` | Button used for form submission to suggestion request.                                                                                                                                                                            |
 | `.js-suggest__suggest` | `HTMLElement`                              | The snippet element where the results are displayed. If there are no children elements, the extension adds a class `js-suggest__suggest--empty`. If the element should be shown, the class `js-suggest__suggest--shown` is added. |

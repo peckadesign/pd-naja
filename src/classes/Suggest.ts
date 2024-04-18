@@ -1,12 +1,16 @@
+import { SpinnerExtension } from '../extensions/SpinnerExtension'
 import { SpinnerPropsFn, SpinnerType, WithSpinner } from '../types'
 import { hideSpinner, showSpinner } from '../utils'
 
-type SuggestOptions = {
+export type SuggestOptions = {
 	minLength: number
 	timeout: number
+	emptyOnNewQuery: boolean
+	showSpinner: boolean
 }
 
 export class Suggest {
+	public readonly spinnerExtension?: SpinnerExtension
 	public readonly spinner?: SpinnerType
 	public readonly getSpinnerProps?: SpinnerPropsFn
 
@@ -30,18 +34,22 @@ export class Suggest {
 
 	private readonly options: SuggestOptions = {
 		minLength: 2,
-		timeout: 200
+		timeout: 200,
+		emptyOnNewQuery: true,
+		showSpinner: true
 	}
 
 	public constructor(
 		form: HTMLFormElement,
 		options: Partial<SuggestOptions> = {},
+		spinnerExtension: SpinnerExtension | undefined = undefined,
 		spinner: SpinnerType | undefined = undefined,
 		getSpinnerProps: SpinnerPropsFn = undefined
 	) {
 		this.form = form
-		this.spinner = spinner
-		this.getSpinnerProps = getSpinnerProps
+		this.spinnerExtension = spinnerExtension
+		this.spinner = spinner || spinnerExtension?.spinner
+		this.getSpinnerProps = getSpinnerProps || spinnerExtension?.getSpinnerProps
 
 		const input = form.querySelector<HTMLInputElement>(`.${this.inputClassName}`)
 		const button = form.querySelector<HTMLButtonElement>(`.${this.buttonClassName}`)
@@ -64,7 +72,8 @@ export class Suggest {
 		this.input.addEventListener('keyup', this.handleInputKeyup.bind(this))
 
 		this.suggest.addEventListener('mousedown', this.handleSuggestMousedown.bind(this))
-
+		// Use the underscore to allow the `element` to be a `form` element. Without the underscore, there would be
+		// a failure to set a named property error.
 		this.form._suggest = this
 	}
 
@@ -109,8 +118,11 @@ export class Suggest {
 		this.suggest.dispatchEvent(new CustomEvent('loading.suggest', { bubbles: true }))
 		this.input.classList.add(`${this.inputClassName}--loading`)
 
-		if (this.spinner && !this.suggestSpinner) {
-			this.suggestSpinner = showSpinner.call(this as WithSpinner, this.form)
+		if (this.options.showSpinner && this.spinner && !this.suggestSpinner) {
+			const targets = this.spinnerExtension?.getTargetsByDOM(this.button)
+			const target = targets && targets.length ? targets[0] : this.form
+
+			this.suggestSpinner = showSpinner.call(this as WithSpinner, target)
 		}
 	}
 
@@ -191,7 +203,7 @@ export class Suggest {
 		if (!this.isOpen) {
 			// If the suggestion wasn't open and this query is different from the last query, we need to clear the
 			// results because they are not relevant. This only needs to be done if the suggestion has been closed.
-			if (query !== this.lastSearched) {
+			if (query !== this.lastSearched && this.options.emptyOnNewQuery) {
 				this.emptySuggest()
 			}
 
