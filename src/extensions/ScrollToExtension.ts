@@ -6,6 +6,7 @@ type NajaScrollToEvent = 'before' | 'success'
 declare module 'naja/dist/Naja' {
 	interface Options {
 		scrollToEvent?: NajaScrollToEvent
+		scrollToOptions?: ScrollIntoViewOptions
 		scrollToSelector?: string
 	}
 }
@@ -31,8 +32,10 @@ export class ScrollToExtension implements Extension {
 
 		if (selector) {
 			const event = element.getAttribute('data-naja-scroll-to-event') as NajaScrollToEvent | undefined
+			const scrollOptions = element.getAttribute('data-naja-scroll-to-options')
 
 			options.scrollToSelector = selector
+			options.scrollToOptions = scrollOptions ? JSON.parse(scrollOptions) : undefined
 			options.scrollToEvent = event ?? this.defaultScrollToEvent
 		}
 	}
@@ -41,8 +44,8 @@ export class ScrollToExtension implements Extension {
 		const { options } = event.detail
 
 		if (options.scrollToSelector && event.type === options.scrollToEvent) {
-			const scrollToElement = document.querySelector(options.scrollToSelector)
-			scrollToElement?.scrollIntoView()
+			const scrollToElement = document.querySelector<HTMLElement>(options.scrollToSelector)
+			scrollToElement?.scrollIntoView(options.scrollToOptions)
 		}
 	}
 }
