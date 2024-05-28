@@ -382,14 +382,20 @@ export class AjaxModalExtension implements Extension {
 			this.modal.show(this.getElementFromString(state.pdModal.opener), state.pdModal.options, event)
 
 			// If there is some snippet cache, we might restore modal options. If not, options will be restored based on
-			// options after the ajax request. Same applies to dispatching load event - if cache is on, we dispatch the
-			// event immediately, otherwise it will be dispatched after ajax request.
+			// options after the ajax request. The same applies to dispatching the load event - if the cache is on, we
+			// dispatch the event immediately (after the restore has actually happened, see below), otherwise it is
+			// dispatched after the ajax request.
 			if (state.snippets?.storage !== 'off') {
 				this.modal.setOptions(state.pdModal.options)
 
-				if (this.modal.dispatchLoad) {
-					this.modal.dispatchLoad(this.modalOptions, event)
-				}
+				// We need to delay the load dispatch after the naja has restored the snippets. Unfortunately, there is
+				// no event after the snippets have been restored, only the `restore` event, which is dispatched before
+				// the actual restore.
+				setTimeout(() => {
+					if (this.modal.dispatchLoad) {
+						this.modal.dispatchLoad(this.modalOptions, event)
+					}
+				}, 0)
 			}
 		} else {
 			this.historyEnabled = false // Hiding modal using forward / back button, we disable the history to prevent state duplication
