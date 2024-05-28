@@ -210,6 +210,11 @@ export class AjaxModalExtension implements Extension {
 		// will also be true, but it is probably the desired behaviour to save this state as non-modal anyway, since
 		// the initial state should (or could) never be opened in a modal.
 		if (operation === 'replaceState' && state.cursor === 0) {
+			// If there already is `pdModal` configuration in history state, we need to preserve that configuration.
+			if (window.history.state?.pdModal) {
+				state.pdModal = window.history.state.pdModal
+			}
+
 			return
 		}
 
