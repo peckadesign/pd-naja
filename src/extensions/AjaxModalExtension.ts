@@ -156,7 +156,7 @@ export class AjaxModalExtension implements Extension {
 
 	private onSnippetFetch(event: FetchEvent): void {
 		// When snippet cache is off, this method is called to construct Naja request options. We retrieve modal
-		// `options` from original state in history if neccessary. Also, when closing the modal from `PopstateEvent`, we
+		// `options` from original state in history if necessary. Also, when closing the modal from `PopstateEvent`, we
 		// don't need to make a new request, so we call `event.preventDefault()` in that case.
 		const { state } = event.detail
 
@@ -201,16 +201,22 @@ export class AjaxModalExtension implements Extension {
 	}
 
 	private buildState(event: BuildStateEvent): void {
-		const { options, state } = event.detail
+		const { operation, options, state } = event.detail
+
+		// If this is called from Naja's `replaceInitialState`, we don't change the state.
+		//
+		// This is a possible weakness, because this condition could be true even with actual user interaction, if
+		// Naja's first interaction is with an element with `data-naja-history="replace"`. In this case the condition
+		// will also be true, but it is probably the desired behaviour to save this state as non-modal anyway, since
+		// the initial state should (or could) never be opened in a modal.
+		if (operation === 'replaceState' && state.cursor === 0) {
+			return
+		}
 
 		// Every time naja builds the state, and we have the modal opened, we extend the state with `pdModal` object
 		// containing information about modal being opened and what history mode is in use. When `options.forceRedirect`
 		// is set, modal might be open but the new state will be redirected outside of it.
-		//
-		// We must check this.modal.isShown instead of this.isPdModalRequest, because of initial replace state from
-		// Naja - in that case, options already contains information about request to be made, but we have to build the
-		// "previous" state yet.
-		const isShown: boolean = this.modal.isShown() && !options.forceRedirect
+		const isShown: boolean = this.isPdModalRequest(options) && !options.forceRedirect
 
 		if (isShown) {
 			state.pdModal = {
