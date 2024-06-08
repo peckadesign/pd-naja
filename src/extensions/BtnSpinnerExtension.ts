@@ -15,6 +15,8 @@ export class BtnSpinnerExtension implements Extension, WithSpinner {
 	public readonly spinner: SpinnerType
 	public readonly getSpinnerProps: SpinnerPropsFn
 
+	private ajaxFormSelector: string | undefined
+
 	public constructor(spinner: SpinnerType, getSpinnerProps: SpinnerPropsFn = undefined, timeout = 60000) {
 		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
@@ -25,9 +27,12 @@ export class BtnSpinnerExtension implements Extension, WithSpinner {
 			const form = event.target
 			const button = form ? (form as HTMLFormElement)['nette-submittedBy'] : null
 
+			// Skip if the form or button is missing, or if the form is handled by Naja, or if the button explicitly
+			// disables the extension.
 			if (
 				!(form instanceof HTMLFormElement) ||
 				!button ||
+				(this.ajaxFormSelector && (form.matches(this.ajaxFormSelector) || button.matches(this.ajaxFormSelector))) ||
 				isDatasetTruthy(button, 'noSpinner') ||
 				isDatasetTruthy(button, 'noBtnSpinner')
 			) {
@@ -46,6 +51,8 @@ export class BtnSpinnerExtension implements Extension, WithSpinner {
 	}
 
 	public initialize(naja: Naja): void {
+		this.ajaxFormSelector = naja.uiHandler.selector
+
 		// AJAX forms and buttons
 		naja.uiHandler.addEventListener('interaction', this.checkExtensionEnabled.bind(this))
 
