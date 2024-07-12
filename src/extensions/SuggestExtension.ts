@@ -26,12 +26,12 @@ export class SuggestExtension implements Extension {
 		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
 
-		const forms = document.querySelectorAll<HTMLFormElement>(`.${Suggest.className}`)
+		const elements = document.querySelectorAll<HTMLElement>(`.${Suggest.className}`)
 
-		forms.forEach((form) => {
-			const options = JSON.parse(form.dataset.suggest || '{}') as Partial<SuggestOptions>
+		elements.forEach((element) => {
+			const options = JSON.parse(element.dataset.suggest || '{}') as Partial<SuggestOptions>
 
-			new Suggest(form, options, spinnerExtension, spinner, getSpinnerProps)
+			new Suggest(element, options, spinnerExtension, spinner, getSpinnerProps)
 		})
 	}
 
