@@ -15,15 +15,17 @@ export class Suggest {
 	public readonly getSpinnerProps?: SpinnerPropsFn
 
 	public static readonly className = 'js-suggest'
+	public readonly formClassName = `${Suggest.className}__form`
 	public readonly inputClassName = `${Suggest.className}__input`
 	public readonly buttonClassName = `${Suggest.className}__btn`
 	public readonly suggestClassName = `${Suggest.className}__suggest`
 	public readonly linkClassName = `${Suggest.className}__link`
 
-	private readonly form: HTMLFormElement
-	private readonly input: HTMLInputElement
-	private readonly button: HTMLButtonElement
-	private readonly suggest: HTMLElement
+	public readonly element: HTMLElement
+	public readonly form: HTMLFormElement
+	public readonly input: HTMLInputElement
+	public readonly button: HTMLButtonElement
+	public readonly suggest: HTMLElement
 
 	private suggestSpinner: Element | undefined
 
@@ -40,31 +42,35 @@ export class Suggest {
 	}
 
 	public constructor(
-		form: HTMLFormElement,
+		element: HTMLElement,
 		options: Partial<SuggestOptions> = {},
 		spinnerExtension: SpinnerExtension | undefined = undefined,
 		spinner: SpinnerType | undefined = undefined,
 		getSpinnerProps: SpinnerPropsFn = undefined
 	) {
-		this.form = form
+		this.element = element
 		this.spinnerExtension = spinnerExtension
 		this.spinner = spinner || spinnerExtension?.spinner
 		this.getSpinnerProps = getSpinnerProps || spinnerExtension?.getSpinnerProps
 
-		const input = form.querySelector<HTMLInputElement>(`.${this.inputClassName}`)
-		const button = form.querySelector<HTMLButtonElement>(`.${this.buttonClassName}`)
-		const suggest = form.querySelector<HTMLElement>(`.${this.suggestClassName}`)
+		const form =
+			element instanceof HTMLFormElement ? element : element.querySelector<HTMLFormElement>(`.${this.formClassName}`)
+		const input = element.querySelector<HTMLInputElement>(`.${this.inputClassName}`)
+		const button = element.querySelector<HTMLButtonElement>(`.${this.buttonClassName}`)
+		const suggest = element.querySelector<HTMLElement>(`.${this.suggestClassName}`)
 
-		if (!input || !button || !suggest) {
-			throw new Error('Suggest: Missing input, button or suggest element.')
+		if (!form || !input || !button || !suggest) {
+			throw new Error('Suggest: Missing form, input, button or suggest element.')
 		}
 
+		this.form = form
 		this.input = input
 		this.button = button
 		this.suggest = suggest
 
 		this.options = { ...this.options, ...options }
 
+		this.input.autocomplete = 'off'
 		this.input.addEventListener('focus', this.showSuggest.bind(this))
 		this.input.addEventListener('blur', this.hideSuggest.bind(this))
 
