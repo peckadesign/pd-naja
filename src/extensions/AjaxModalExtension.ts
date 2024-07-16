@@ -203,6 +203,12 @@ export class AjaxModalExtension implements Extension {
 	private buildState(event: BuildStateEvent): void {
 		const { operation, options, state } = event.detail
 
+		// Always add a `title` into state, so we can retrieve it when needed after closing the modal. See
+		// `popstateHandler` below.
+		if (!state.title) {
+			state.title = document.title
+		}
+
 		// If this is called from Naja's `replaceInitialState`, we don't change the state.
 		//
 		// This is a possible weakness, because this condition could be true even with actual user interaction, if
@@ -365,7 +371,6 @@ export class AjaxModalExtension implements Extension {
 
 				return
 			} else {
-				// Todo check if this is really necessary. When used with nette.ajax / history.nette.ajax, this was necessary in some cases, where the title hasn't been restored correctly.
 				if (state.title) {
 					document.title = state.title
 				}
