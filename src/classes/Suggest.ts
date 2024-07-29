@@ -4,6 +4,7 @@ import { hideSpinner, showSpinner } from '../utils'
 
 export type SuggestOptions = {
 	minLength: number
+	minLengthForShow: number
 	timeout: number
 	emptyOnNewQuery: boolean
 	showSpinner: boolean
@@ -36,6 +37,7 @@ export class Suggest {
 
 	private readonly options: SuggestOptions = {
 		minLength: 2,
+		minLengthForShow: 2,
 		timeout: 200,
 		emptyOnNewQuery: true,
 		showSpinner: true
@@ -88,7 +90,7 @@ export class Suggest {
 	}
 
 	private showSuggest(): void {
-		if (this.isEmpty() || this.input.value.length < this.options.minLength) {
+		if (this.isEmpty() || this.input.value.length < this.options.minLengthForShow) {
 			return
 		}
 
@@ -201,7 +203,7 @@ export class Suggest {
 
 		const query = this.input.value
 
-		if (query.length < this.options.minLength) {
+		if (query.length < this.options.minLengthForShow) {
 			this.hideSuggest()
 			return
 		}
@@ -216,8 +218,8 @@ export class Suggest {
 			this.showSuggest()
 		}
 
-		// If the query is the same, there's nothing more to do.
-		if (query === this.lastSearched) {
+		// If the query is the same or not long enough, there's nothing more to do.
+		if (query === this.lastSearched || query.length < this.options.minLength) {
 			return
 		}
 
@@ -229,5 +231,10 @@ export class Suggest {
 
 	private handleSuggestMousedown(event: MouseEvent): void {
 		event.preventDefault()
+
+		const target = event.target as HTMLElement
+		if (target.dataset.suggestClose || target.closest('[data-suggest-close]')) {
+			this.input.blur()
+		}
 	}
 }
