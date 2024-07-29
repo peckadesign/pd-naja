@@ -154,7 +154,7 @@ The logic for spinner target is as follows:
    2. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
 
 
-### `SuggestExtensions`
+### `SuggestExtension`
 This extension allows you to implement a suggestion box. It uses a form element with a dedicated suggestion button to submit the form using ajax. The result of the request is expected to be the redrawing of the snippet with results. See below for a detailed description of the elements. The extension constructor takes optional an `spinnerExtension: SpinnerExtension`, `spinner` and `getSpinnerProps` parameters, the types of the latter two parameters are described in the [`SpinnerExtension`](#spinnerextension) and [`BtnSpinnerExtension`](#btnspinnerextension).
 
 If the `spinnerExtension` is passed and the latter two are omitted, they are set by the passed extension instance. In addition, the target element for the spinner is determined as in the `SpinnerExtension` algorithm (4). The fallback target is always the form element.
