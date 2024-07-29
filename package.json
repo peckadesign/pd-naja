@@ -1,7 +1,7 @@
 {
 	"name": "@peckadesign/pd-naja",
 	"title": "PD Naja utils & extensions",
-	"version": "2.3.1",
+	"version": "2.4.0",
 	"private": false,
 	"description": "Utilities and extensions created for use with Naja library.",
 	"main": "dist/PdNaja.esm.js",
