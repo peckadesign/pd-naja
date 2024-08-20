@@ -58,6 +58,10 @@ export class BtnSpinnerExtension implements Extension, WithSpinner {
 
 		naja.addEventListener('start', this.handleStartEvent.bind(this))
 		naja.addEventListener('complete', this.handleCompleteEvent.bind(this))
+
+		// On redirect, remove the `btnSpinnerInitiator` from the options. This will prevent another spinner being
+		// created (the spinner is preserved in `handleCompleteEvent` when `payload.redirect` is set).
+		naja.redirectHandler.addEventListener('redirect', (event) => delete event.detail.options.btnSpinnerInitiator)
 	}
 
 	private checkExtensionEnabled(event: InteractionEvent): void {
@@ -79,9 +83,9 @@ export class BtnSpinnerExtension implements Extension, WithSpinner {
 	}
 
 	private handleCompleteEvent(event: CompleteEvent): void {
-		const { options } = event.detail
+		const { options, payload } = event.detail
 
-		if (options.forceRedirect || !options.btnSpinner) {
+		if (options.forceRedirect || !options.btnSpinner || payload?.redirect) {
 			return
 		}
 

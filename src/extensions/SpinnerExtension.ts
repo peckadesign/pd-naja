@@ -20,6 +20,7 @@ import { hideSpinner, showSpinner } from '../utils'
 declare module 'naja/dist/Naja' {
 	interface Options {
 		spinnerInitiator?: Element
+		spinnerQueue?: Element[]
 	}
 }
 
@@ -48,6 +49,10 @@ export class SpinnerExtension implements Extension, WithSpinner {
 
 		naja.addEventListener('start', this.showSpinners.bind(this))
 		naja.addEventListener('complete', this.hideSpinners.bind(this))
+
+		// On redirect, remove the `spinnerInitiator` from the options. This will prevent another spinner being created
+		// (the spinner is preserved in `hideSpinners` when `payload.redirect` is set).
+		naja.redirectHandler.addEventListener('redirect', (event) => delete event.detail.options.spinnerInitiator)
 	}
 
 	private getSpinnerInitiator(event: InteractionEvent): void {
@@ -70,15 +75,16 @@ export class SpinnerExtension implements Extension, WithSpinner {
 			options.spinnerQueue = options.spinnerQueue || []
 
 			placeholders.forEach((placeholder) => {
-				options.spinnerQueue.push(showSpinner.call(this, placeholder, spinnerInitiator))
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				options.spinnerQueue!.push(showSpinner.call(this, placeholder, spinnerInitiator))
 			})
 		}
 	}
 
 	private hideSpinners(event: CompleteEvent): void {
-		const { options } = event.detail
+		const { options, payload } = event.detail
 
-		if (options.forceRedirect) {
+		if (options.forceRedirect || payload?.redirect) {
 			return
 		}
 
