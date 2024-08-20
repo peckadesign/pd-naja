@@ -16,7 +16,7 @@ export class Suggest {
 	public readonly getSpinnerProps?: SpinnerPropsFn
 
 	public static readonly className = 'js-suggest'
-	public readonly formClassName = `${Suggest.className}__form`
+	public static readonly formClassName = `${Suggest.className}__form`
 	public readonly inputClassName = `${Suggest.className}__input`
 	public readonly buttonClassName = `${Suggest.className}__btn`
 	public readonly suggestClassName = `${Suggest.className}__suggest`
@@ -45,6 +45,7 @@ export class Suggest {
 
 	public constructor(
 		element: HTMLElement,
+		form: HTMLFormElement,
 		options: Partial<SuggestOptions> = {},
 		spinnerExtension: SpinnerExtension | undefined = undefined,
 		spinner: SpinnerType | undefined = undefined,
@@ -55,13 +56,11 @@ export class Suggest {
 		this.spinner = spinner || spinnerExtension?.spinner
 		this.getSpinnerProps = getSpinnerProps || spinnerExtension?.getSpinnerProps
 
-		const form =
-			element instanceof HTMLFormElement ? element : element.querySelector<HTMLFormElement>(`.${this.formClassName}`)
 		const input = element.querySelector<HTMLInputElement>(`.${this.inputClassName}`)
 		const button = element.querySelector<HTMLButtonElement>(`.${this.buttonClassName}`)
 		const suggest = element.querySelector<HTMLElement>(`.${this.suggestClassName}`)
 
-		if (!form || !input || !button || !suggest) {
+		if (!input || !button || !suggest) {
 			throw new Error('Suggest: Missing form, input, button or suggest element.')
 		}
 
