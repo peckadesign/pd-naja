@@ -1,3 +1,4 @@
+import { AfterUpdateEvent } from 'naja/dist/core/SnippetHandler'
 import { InteractionEvent } from 'naja/dist/core/UIHandler'
 import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
 import { Suggest, SuggestOptions } from '../classes/Suggest'
@@ -26,19 +27,36 @@ export class SuggestExtension implements Extension {
 		this.spinner = spinner
 		this.getSpinnerProps = getSpinnerProps
 
-		const elements = document.querySelectorAll<HTMLElement>(`.${Suggest.className}`)
-
-		elements.forEach((element) => {
-			const options = JSON.parse(element.dataset.suggest || '{}') as Partial<SuggestOptions>
-
-			new Suggest(element, options, spinnerExtension, spinner, getSpinnerProps)
-		})
+		this.bindUI(document)
 	}
 
 	public initialize(naja: Naja): void {
+		naja.snippetHandler.addEventListener('afterUpdate', (event: AfterUpdateEvent) => this.bindUI(event.detail.snippet))
+
 		naja.uiHandler.addEventListener('interaction', this.checkExtensionEnabled.bind(this))
+
 		naja.addEventListener('start', this.start.bind(this))
 		naja.addEventListener('complete', this.complete.bind(this))
+	}
+
+	private bindUI(context: Element | Document): void {
+		const elements = context.querySelectorAll<HTMLElement>(`.${Suggest.className}`)
+
+		elements.forEach((element) => {
+			const form =
+				element instanceof HTMLFormElement
+					? element
+					: element.querySelector<HTMLFormElement>(`.${Suggest.formClassName}`)
+
+			// Prevent duplicate listener bindings when already initialized
+			if (!form || form._suggest !== undefined) {
+				return
+			}
+
+			const options = JSON.parse(element.dataset.suggest || '{}') as Partial<SuggestOptions>
+
+			new Suggest(element, form, options, this.spinnerExtension, this.spinner, this.getSpinnerProps)
+		})
 	}
 
 	private checkExtensionEnabled(event: InteractionEvent): void {
