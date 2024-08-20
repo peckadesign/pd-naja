@@ -244,13 +244,16 @@ export class AjaxModalExtension implements Extension {
 
 	private before(event: BeforeEvent) {
 		const { options, request } = event.detail
-		if (!this.isPdModalRequest(options)) {
+		const isPdModalRequest = this.isPdModalRequest(options)
+
+		// Set the header according to the modal being already opened or to be opened.
+		request.headers.append('Pd-Modal-Opened', String(Number(this.modal.isShown() || isPdModalRequest)))
+
+		if (!isPdModalRequest) {
 			return
 		}
 
 		this.modal.show(options.modalOpener, options.modalOptions, event)
-
-		request.headers.append('Pd-Modal-Opened', String(Number(this.modal.isShown())))
 	}
 
 	private success(event: SuccessEvent) {
