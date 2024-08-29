@@ -191,7 +191,7 @@ export class Suggest {
 					event.preventDefault()
 					event.stopPropagation()
 
-					location.href = activeAnchor.href
+					activeAnchor.click()
 				}
 				break
 		}
