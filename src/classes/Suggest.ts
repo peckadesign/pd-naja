@@ -112,6 +112,13 @@ export class Suggest {
 			return
 		}
 
+		const activeClassName = `${this.linkClassName}--active`
+		const activeAnchor: HTMLAnchorElement | null | undefined = this.suggest.querySelector<HTMLAnchorElement>(
+			`.${activeClassName}`
+		)
+
+		activeAnchor?.classList.remove(activeClassName)
+
 		this.isOpen = false
 		this.suggest.classList.remove(`${this.suggestClassName}--shown`)
 	}
@@ -154,16 +161,12 @@ export class Suggest {
 	private handleInputKeydown(event: KeyboardEvent): void {
 		const activeClassName = `${this.linkClassName}--active`
 		let anchors: HTMLAnchorElement[]
-		const activeAnchor: HTMLAnchorElement | null | undefined = this.suggest.querySelector<HTMLAnchorElement>(
-			`.${activeClassName}`
-		)
+		let activeAnchor: HTMLAnchorElement | null | undefined
 		let activeAnchorIndex: number | undefined
 
 		switch (event.key) {
 			case 'Escape':
 				event.preventDefault()
-
-				activeAnchor?.classList.remove(activeClassName)
 
 				this.hideSuggest()
 				this.input.blur()
@@ -175,6 +178,7 @@ export class Suggest {
 				event.preventDefault()
 
 				anchors = Array.from(this.suggest.querySelectorAll<HTMLAnchorElement>(`.${this.linkClassName}`))
+				activeAnchor = anchors.find((element) => element.classList.contains(activeClassName))
 				activeAnchorIndex = activeAnchor ? anchors.indexOf(activeAnchor) : undefined
 
 				activeAnchor?.classList.remove(activeClassName)
@@ -193,6 +197,8 @@ export class Suggest {
 				break
 
 			case 'Enter':
+				activeAnchor = this.suggest.querySelector<HTMLAnchorElement>(`.${activeClassName}`)
+
 				if (activeAnchor) {
 					event.preventDefault()
 					event.stopPropagation()
