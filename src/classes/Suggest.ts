@@ -17,10 +17,10 @@ export class Suggest {
 
 	public static readonly className = 'js-suggest'
 	public static readonly formClassName = `${Suggest.className}__form`
-	public readonly inputClassName = `${Suggest.className}__input`
-	public readonly buttonClassName = `${Suggest.className}__btn`
-	public readonly suggestClassName = `${Suggest.className}__suggest`
-	public readonly linkClassName = `${Suggest.className}__link`
+	public static readonly inputClassName = `${Suggest.className}__input`
+	public static readonly buttonClassName = `${Suggest.className}__btn`
+	public static readonly suggestClassName = `${Suggest.className}__suggest`
+	public static readonly linkClassName = `${Suggest.className}__link`
 
 	public readonly element: HTMLElement
 	public readonly form: HTMLFormElement
@@ -56,9 +56,9 @@ export class Suggest {
 		this.spinner = spinner || spinnerExtension?.spinner
 		this.getSpinnerProps = getSpinnerProps || spinnerExtension?.getSpinnerProps
 
-		const input = element.querySelector<HTMLInputElement>(`.${this.inputClassName}`)
-		const button = element.querySelector<HTMLButtonElement>(`.${this.buttonClassName}`)
-		const suggest = element.querySelector<HTMLElement>(`.${this.suggestClassName}`)
+		const input = element.querySelector<HTMLInputElement>(`.${Suggest.inputClassName}`)
+		const button = element.querySelector<HTMLButtonElement>(`.${Suggest.buttonClassName}`)
+		const suggest = element.querySelector<HTMLElement>(`.${Suggest.suggestClassName}`)
 
 		if (!input || !button || !suggest) {
 			throw new Error('Suggest: Missing form, input, button or suggest element.')
@@ -101,7 +101,7 @@ export class Suggest {
 		}
 
 		this.isOpen = true
-		this.suggest.classList.add(`${this.suggestClassName}--shown`)
+		this.suggest.classList.add(`${Suggest.suggestClassName}--shown`)
 	}
 
 	private hideSuggest(): void {
@@ -112,7 +112,7 @@ export class Suggest {
 			return
 		}
 
-		const activeClassName = `${this.linkClassName}--active`
+		const activeClassName = `${Suggest.linkClassName}--active`
 		const activeAnchor: HTMLAnchorElement | null | undefined = this.suggest.querySelector<HTMLAnchorElement>(
 			`.${activeClassName}`
 		)
@@ -120,17 +120,17 @@ export class Suggest {
 		activeAnchor?.classList.remove(activeClassName)
 
 		this.isOpen = false
-		this.suggest.classList.remove(`${this.suggestClassName}--shown`)
+		this.suggest.classList.remove(`${Suggest.suggestClassName}--shown`)
 	}
 
 	private emptySuggest(): void {
-		this.suggest.classList.add(`${this.suggestClassName}--empty`)
+		this.suggest.classList.add(`${Suggest.suggestClassName}--empty`)
 		this.suggest.replaceChildren()
 	}
 
 	public startSuggest(): void {
 		this.suggest.dispatchEvent(new CustomEvent('loading.suggest', { bubbles: true }))
-		this.input.classList.add(`${this.inputClassName}--loading`)
+		this.input.classList.add(`${Suggest.inputClassName}--loading`)
 
 		if (this.options.showSpinner && this.spinner && !this.suggestSpinner) {
 			const targets = this.spinnerExtension?.getTargetsByDOM(this.button)
@@ -142,9 +142,9 @@ export class Suggest {
 
 	public finishSuggest(): void {
 		this.suggest.dispatchEvent(new CustomEvent('loaded.suggest', { bubbles: true }))
-		this.input.classList.remove(`${this.inputClassName}--loading`)
+		this.input.classList.remove(`${Suggest.inputClassName}--loading`)
 
-		this.suggest.classList.toggle(`${this.suggestClassName}--empty`, this.isEmpty())
+		this.suggest.classList.toggle(`${Suggest.suggestClassName}--empty`, this.isEmpty())
 
 		if (this.isEmpty() || document.activeElement !== this.input) {
 			this.hideSuggest()
@@ -159,7 +159,7 @@ export class Suggest {
 	}
 
 	private handleInputKeydown(event: KeyboardEvent): void {
-		const activeClassName = `${this.linkClassName}--active`
+		const activeClassName = `${Suggest.linkClassName}--active`
 		let anchors: HTMLAnchorElement[]
 		let activeAnchor: HTMLAnchorElement | null | undefined
 		let activeAnchorIndex: number | undefined
@@ -177,7 +177,7 @@ export class Suggest {
 			case 'ArrowUp':
 				event.preventDefault()
 
-				anchors = Array.from(this.suggest.querySelectorAll<HTMLAnchorElement>(`.${this.linkClassName}`))
+				anchors = Array.from(this.suggest.querySelectorAll<HTMLAnchorElement>(`.${Suggest.linkClassName}`))
 				activeAnchor = anchors.find((element) => element.classList.contains(activeClassName))
 				activeAnchorIndex = activeAnchor ? anchors.indexOf(activeAnchor) : undefined
 
