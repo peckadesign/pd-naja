@@ -62,9 +62,9 @@ export class SuggestExtension implements Extension {
 	private checkExtensionEnabled(event: InteractionEvent): void {
 		const { element, options } = event.detail
 
-		const inputElement = element as HTMLInputElement
-		if (inputElement.form && inputElement.form._suggest) {
-			options.suggest = inputElement.form._suggest
+		const buttonElement = element as HTMLButtonElement
+		if (buttonElement.classList.contains(Suggest.buttonClassName) && buttonElement.form?._suggest) {
+			options.suggest = buttonElement.form._suggest
 		}
 	}
 
