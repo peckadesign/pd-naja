@@ -7,6 +7,7 @@ export type SuggestOptions = {
 	minLengthForShow: number
 	timeout: number
 	emptyOnNewQuery: boolean
+	preventDefaultOnEnter: boolean
 	showSpinner: boolean
 }
 
@@ -40,6 +41,7 @@ export class Suggest {
 		minLengthForShow: 2,
 		timeout: 200,
 		emptyOnNewQuery: true,
+		preventDefaultOnEnter: false,
 		showSpinner: true
 	}
 
@@ -204,7 +206,10 @@ export class Suggest {
 					event.stopPropagation()
 
 					activeAnchor.click()
+				} else if (this.options.preventDefaultOnEnter) {
+					event.preventDefault()
 				}
+
 				break
 		}
 	}
