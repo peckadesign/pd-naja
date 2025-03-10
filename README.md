@@ -183,3 +183,14 @@ With this extension you can change the classes on the interacted element immedia
 ```
 
 This configuration would add the `active` class to the anchor element and the `rounded-full` class to the image. It would also remove the `shadow` class from the image as it was already present.
+
+You can also target elements outside the `:scope` of an element using the proprietary `:parent` selector.
+
+For example, the code below toggles the `active` class on the clicked element while also removing it from the previously active element inside the same parent element. If you click the same element repeatedly, the class remains because it is removed and immediately added back.
+```html
+<a … data-naja-toggle-class='{
+       ":parent .active, :self": "active",
+   }'>
+	…
+</a>
+```

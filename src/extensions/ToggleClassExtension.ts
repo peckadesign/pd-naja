@@ -4,7 +4,7 @@ import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
 type ToggleClassRecord = Record<string, string>
 
 type ToggleClassOptions = {
-	element: Element
+	element: HTMLElement
 	toggleClass: ToggleClassRecord
 }
 
@@ -15,6 +15,9 @@ declare module 'naja/dist/Naja' {
 }
 
 export class ToggleClassExtension implements Extension {
+	private static selfSelector = ':self'
+	private static parentSelector = ':parent'
+
 	public initialize(naja: Naja) {
 		naja.uiHandler.addEventListener('interaction', this.checkExtensionEnabled.bind(this))
 		naja.addEventListener('start', this.start.bind(this))
@@ -27,7 +30,7 @@ export class ToggleClassExtension implements Extension {
 
 		if (toggleClass) {
 			options.toggleClassOptions = {
-				element,
+				element: element as HTMLElement,
 				toggleClass
 			}
 		}
@@ -51,12 +54,36 @@ export class ToggleClassExtension implements Extension {
 
 	private applyToggleClass(toggleClassOptions: ToggleClassOptions): void {
 		for (const [selector, classNames] of Object.entries(toggleClassOptions.toggleClass)) {
-			const targets =
-				selector === ':self' ? [toggleClassOptions.element] : toggleClassOptions.element.querySelectorAll(selector)
+			const targets = this.getTargetElements(toggleClassOptions.element, selector)
 
 			targets.forEach((target) => {
 				classNames.split(' ').forEach((className) => target.classList.toggle(className))
 			})
 		}
+	}
+
+	private getTargetElements(element: HTMLElement, selector: string): HTMLElement[] {
+		const elements: HTMLElement[] = []
+
+		selector.split(',').forEach((singleSelector) => {
+			elements.push(...this.getTargetElementsSingleSelector(element, singleSelector.trim()))
+		})
+
+		return elements
+	}
+
+	private getTargetElementsSingleSelector(element: HTMLElement, selector: string): HTMLElement[] {
+		let baseElement: Element = element
+
+		if (selector === ToggleClassExtension.selfSelector) {
+			return [element]
+		}
+
+		while (selector.startsWith(ToggleClassExtension.parentSelector) && baseElement.parentElement) {
+			baseElement = baseElement.parentElement
+			selector = selector.slice(ToggleClassExtension.parentSelector.length + 1)
+		}
+
+		return Array.from(baseElement.querySelectorAll(selector))
 	}
 }
