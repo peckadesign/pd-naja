@@ -41,9 +41,10 @@ export class SingleSubmitExtension implements Extension {
 
 		naja.addEventListener('start', (event: StartEvent) => {
 			if (event.detail.options.singleSubmitForm) {
-				this.formSubmitBeforeHandler(event.detail.options.singleSubmitForm)
+				this.formSubmitBeforeHandler(event.detail.options.singleSubmitForm, true)
 			}
 		})
+
 		naja.addEventListener('complete', (event: CompleteEvent) => {
 			if (event.detail.options.singleSubmitForm) {
 				this.formSubmitAfterHandler(event.detail.options.singleSubmitForm)
@@ -73,7 +74,7 @@ export class SingleSubmitExtension implements Extension {
 		event.preventDefault()
 	}
 
-	private formSubmitBeforeHandler(form: HTMLFormElement): void {
+	private formSubmitBeforeHandler(form: HTMLFormElement, isAjax: boolean = false): void {
 		// Non-ajax forms
 		clearTimeout(Number(form.dataset.singleSubmitTimeout))
 		delete form.dataset.singleSubmitTimeout
@@ -81,12 +82,14 @@ export class SingleSubmitExtension implements Extension {
 		form.addEventListener('submit', this.preventFormSubmit)
 
 		// All forms;
-		// Make sure the `disabled` attribute is set after submitting the form.
-		setTimeout(() => {
-			form.querySelectorAll<HTMLSubmitElement>(this.submitSelector).forEach((submit) => {
-				this.disableSubmitElement(submit)
-			})
-		}, 0)
+		// Make sure the `disabled` attribute is set after submitting the form. In the case of AJAX forms, the
+		// `formData` is constructed during the `makeRequest` function and the `before` event is dispatched afterward,
+		// so there is no need to use `setTimeout` in this scenario.
+		if (isAjax) {
+			this.disableSubmitForm(form)
+		} else {
+			setTimeout(() => this.disableSubmitForm(form), 0)
+		}
 	}
 
 	private formSubmitAfterHandler(form: HTMLFormElement): void {
@@ -96,14 +99,14 @@ export class SingleSubmitExtension implements Extension {
 
 		form.removeEventListener('submit', this.preventFormSubmit)
 
-		// All forms;
-		// Ensures that the `disabled` attribute is set only after the `formSubmitBeforeHandler` method has finished;
-		// for example, a request could have been aborted before the `disabled` attribute was set
-		setTimeout(() => {
-			form.querySelectorAll<HTMLSubmitElement>(this.submitSelector).forEach((submit) => {
-				this.enableSubmitElement(submit)
-			})
-		}, 0)
+		// All forms
+		this.enableSubmitForm(form)
+	}
+
+	private disableSubmitForm(form: HTMLFormElement): void {
+		form.querySelectorAll<HTMLSubmitElement>(this.submitSelector).forEach((submit) => {
+			this.disableSubmitElement(submit)
+		})
 	}
 
 	private disableSubmitElement(button: HTMLSubmitElement): void {
@@ -118,6 +121,12 @@ export class SingleSubmitExtension implements Extension {
 		if (this.buttonDisabledClass) {
 			button.classList.add(this.buttonDisabledClass)
 		}
+	}
+
+	private enableSubmitForm(form: HTMLFormElement): void {
+		form.querySelectorAll<HTMLSubmitElement>(this.submitSelector).forEach((submit) => {
+			this.enableSubmitElement(submit)
+		})
 	}
 
 	private enableSubmitElement(button: HTMLSubmitElement): void {
