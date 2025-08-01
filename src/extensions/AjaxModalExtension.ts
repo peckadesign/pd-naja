@@ -242,7 +242,7 @@ export class AjaxModalExtension implements Extension {
 		this.historyEnabled = true
 	}
 
-	private before(event: BeforeEvent) {
+	private before(event: BeforeEvent): void {
 		const { options, request } = event.detail
 		const isPdModalRequest = this.isPdModalRequest(options)
 
@@ -250,13 +250,16 @@ export class AjaxModalExtension implements Extension {
 		request.headers.append('Pd-Modal-Opened', String(Number(this.modal.isShown() || isPdModalRequest)))
 
 		if (!isPdModalRequest) {
+			// If the request is not pdModal request, we will prevent modal redraw.
+			request.headers.append('Pd-Modal-Prevent-Redraw', String(1))
+
 			return
 		}
 
 		this.modal.show(options.modalOpener, options.modalOptions, event)
 	}
 
-	private success(event: SuccessEvent) {
+	private success(event: SuccessEvent): void {
 		const { options, payload } = event.detail
 
 		this.popstateFlag = false
@@ -292,7 +295,7 @@ export class AjaxModalExtension implements Extension {
 		}
 	}
 
-	private showHandler() {
+	private showHandler(): void {
 		this.modal.setOptions(this.modalOptions)
 
 		// If the modal history mode is `forwards`, we store the state under the modal, so we can push it as a new state
