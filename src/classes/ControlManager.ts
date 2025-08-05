@@ -6,8 +6,8 @@ let instance: ControlManager | null = null
 
 export class ControlManager {
 	private naja!: Naja
-	private onLoadControl: Control[] = []
-	private onLiveControl: Control[] = []
+	public readonly onLoadControl: Control[] = []
+	public readonly onLiveControl: Control[] = []
 
 	public constructor(naja: Naja) {
 		if (instance === null) {
@@ -18,11 +18,6 @@ export class ControlManager {
 			this.naja.snippetHandler.addEventListener('afterUpdate', this.onSnippetUpdate.bind(this))
 		}
 		return instance
-	}
-
-	public onLoad(): void {
-		this.initialize(this.onLoadControl)
-		this.initialize(this.onLiveControl)
 	}
 
 	private onBeforeSnippetUpdate(event: BeforeUpdateEvent): void {
@@ -40,13 +35,13 @@ export class ControlManager {
 		this.initialize(this.onLiveControl, event.detail.snippet)
 	}
 
-	private initialize(controls: Control[], snippet?: Element | Document): void {
+	private initialize(controls: Control[], snippet: Element): void {
 		controls.forEach((control) => {
-			control.initialize(snippet || document)
+			control.initialize(snippet)
 		})
 	}
 
-	private destroy(controls: Control[], snippet: Element): void {
+	public destroy(controls: Control[], snippet: Element): void {
 		controls.forEach((control) => {
 			if (control.destroy !== undefined) {
 				control.destroy(snippet)
@@ -55,10 +50,20 @@ export class ControlManager {
 	}
 
 	public addControlOnLoad(control: Control): void {
+		this.initializeControlOnLoad(control)
 		this.onLoadControl.push(control)
 	}
 
 	public addControlOnLive(control: Control): void {
+		this.initializeControlOnLoad(control)
 		this.onLiveControl.push(control)
+	}
+
+	private initializeControlOnLoad(control: Control): void {
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', () => control.initialize(document), { once: true })
+		} else {
+			control.initialize(document)
+		}
 	}
 }
