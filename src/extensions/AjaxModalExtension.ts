@@ -385,7 +385,9 @@ export class AjaxModalExtension implements Extension {
 			// We don't want the naja popstate callback to be executed (or any other popstate handler).
 			event.stopImmediatePropagation()
 
-			if (isCurrentStatePdModal) {
+			// If the `state.cursor` is 0, the page has been refreshed, and we don't want to go back in history any
+			// more.
+			if (isCurrentStatePdModal && state.cursor !== 0) {
 				window.history.back()
 
 				return
