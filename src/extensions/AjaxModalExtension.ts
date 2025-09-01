@@ -103,10 +103,7 @@ export class AjaxModalExtension implements Extension {
 		naja.addEventListener('complete', this.clearRequest.bind(this))
 
 		this.modal.onShow(this.showHandler.bind(this))
-		this.modal.onHide(() => {
-			this.removeModalSnippetsIds()
-			this.abortControllers.get('modal')?.abort()
-		})
+		this.modal.onHide(this.hideHandler.bind(this))
 		this.modal.onHidden(this.hiddenHandler.bind(this))
 	}
 
@@ -316,7 +313,21 @@ export class AjaxModalExtension implements Extension {
 		}
 	}
 
-	private hiddenHandler() {
+	private hideHandler(event: Event): void {
+		const opener = (event as CustomEvent).detail?.opener as Element | undefined
+		const abortable = opener
+			? (opener.getAttribute('data-naja-abort') ??
+					(opener as HTMLInputElement).form?.getAttribute('data-naja-abort')) !== 'off'
+			: true
+
+		this.removeModalSnippetsIds()
+
+		if (abortable) {
+			this.abortControllers.get(this.uniqueExtKey)?.abort()
+		}
+	}
+
+	private hiddenHandler(): void {
 		// This method is called after the modal has been hidden. It either pushes a new state into history (mode
 		// `forwards`) or calls `history.back()` to start go-back procedure.
 		//
