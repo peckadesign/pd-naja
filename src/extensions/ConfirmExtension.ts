@@ -1,5 +1,4 @@
-import { Extension, Naja } from 'naja/dist/Naja'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
+import { Extension, InteractionEvent, Naja } from 'naja'
 
 export class ConfirmExtension implements Extension {
 	public initialize(naja: Naja): void {

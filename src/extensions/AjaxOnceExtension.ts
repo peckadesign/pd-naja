@@ -1,8 +1,7 @@
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { Extension, Naja, SuccessEvent } from 'naja/dist/Naja'
+import { Extension, InteractionEvent, Naja, SuccessEvent } from 'naja'
 import { isDatasetTruthy } from '../utils'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		ajaxOnceInitiator?: HTMLElement | SVGElement
 	}

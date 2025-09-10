@@ -1,5 +1,4 @@
-import { AfterUpdateEvent } from 'naja/dist/core/SnippetHandler'
-import { Extension, Naja } from 'naja/dist/Naja'
+import { AfterUpdateEvent, Extension, Naja } from 'naja'
 
 export class SnippetFormPartExtension implements Extension {
 	private netteForms: any

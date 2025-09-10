@@ -1,5 +1,4 @@
-import { AfterUpdateEvent, BeforeUpdateEvent } from 'naja/dist/core/SnippetHandler'
-import { Naja } from 'naja/dist/Naja'
+import { AfterUpdateEvent, BeforeUpdateEvent, Naja } from 'naja'
 import { Control } from '../types'
 
 let instance: ControlManager | null = null

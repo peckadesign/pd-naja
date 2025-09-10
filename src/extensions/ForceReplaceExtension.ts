@@ -1,9 +1,7 @@
-import { Extension, Naja } from 'naja/dist/Naja'
-import { BeforeUpdateEvent } from 'naja/dist/core/SnippetHandler'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
+import { BeforeUpdateEvent, Extension, InteractionEvent, Naja } from 'naja'
 import { isDatasetTruthy } from '../utils'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		forceReplace?: boolean
 	}

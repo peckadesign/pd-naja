@@ -1,9 +1,8 @@
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
+import { CompleteEvent, Extension, InteractionEvent, Naja, StartEvent } from 'naja'
 import { SpinnerPropsFn, SpinnerType, WithSpinner } from '../types'
 import { hideSpinner, isDatasetTruthy, showSpinner } from '../utils'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		btnSpinnerInitiator?: Element
 		btnSpinner?: Element

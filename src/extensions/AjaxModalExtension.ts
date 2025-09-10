@@ -1,9 +1,18 @@
-import { Naja, BeforeEvent, CompleteEvent, StartEvent, SuccessEvent, Options, Extension } from 'naja/dist/Naja'
-import { BuildStateEvent, HistoryState } from 'naja/dist/core/HistoryHandler'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { FetchEvent } from 'naja/dist/core/SnippetCache'
+import {
+	BeforeEvent,
+	BuildStateEvent,
+	CompleteEvent,
+	Extension,
+	FetchEvent,
+	HistoryState,
+	InteractionEvent,
+	Naja,
+	Options,
+	StartEvent,
+	SuccessEvent
+} from 'naja'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		pdModal?: boolean
 		modalOpener?: Element

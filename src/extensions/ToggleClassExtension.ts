@@ -1,5 +1,4 @@
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
+import { CompleteEvent, Extension, InteractionEvent, Naja, StartEvent } from 'naja'
 
 type ToggleClassRecord = Record<string, string>
 
@@ -8,7 +7,7 @@ type ToggleClassOptions = {
 	toggleClass: ToggleClassRecord
 }
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		toggleClassOptions?: ToggleClassOptions
 	}
