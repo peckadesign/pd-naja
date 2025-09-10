@@ -25,7 +25,7 @@ export class AjaxModalPreventRedrawExtension implements Extension {
 		const { options, request } = event.detail
 
 		if (options.pdModalPreventRedraw) {
-			request.headers.append('Pd-Modal-Prevent-Redraw', String(1))
+			request.headers.set('Pd-Modal-Prevent-Redraw', String(1))
 		}
 	}
 }

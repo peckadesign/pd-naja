@@ -249,7 +249,7 @@ export class AjaxModalExtension implements Extension {
 
 		if (!isPdModalRequest) {
 			// If the request is not pdModal request, we will prevent modal redraw.
-			request.headers.append('Pd-Modal-Prevent-Redraw', String(1))
+			request.headers.set('Pd-Modal-Prevent-Redraw', String(1))
 
 			return
 		}
