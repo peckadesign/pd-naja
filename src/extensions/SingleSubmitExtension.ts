@@ -1,10 +1,9 @@
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
+import { CompleteEvent, Extension, InteractionEvent, Naja, StartEvent } from 'naja'
 import { isDatasetFalsy } from '../utils'
 
 type HTMLSubmitElement = HTMLButtonElement | HTMLInputElement
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		singleSubmitForm?: HTMLFormElement
 	}

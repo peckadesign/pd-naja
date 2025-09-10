@@ -1,11 +1,9 @@
-import { AfterUpdateEvent } from 'naja/dist/core/SnippetHandler'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
+import { AfterUpdateEvent, CompleteEvent, Extension, InteractionEvent, Naja, StartEvent } from 'naja'
 import { Suggest, SuggestOptions } from '../classes/Suggest'
 import { SpinnerPropsFn, SpinnerType } from '../types'
 import { SpinnerExtension } from './SpinnerExtension'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		suggest?: Suggest
 	}

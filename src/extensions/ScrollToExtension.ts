@@ -1,9 +1,8 @@
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
-import { BeforeEvent, Extension, Naja, SuccessEvent } from 'naja/dist/Naja'
+import { BeforeEvent, Extension, InteractionEvent, Naja, SuccessEvent } from 'naja'
 
 type NajaScrollToEvent = 'before' | 'success'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		scrollToEvent?: NajaScrollToEvent
 		scrollToOptions?: ScrollIntoViewOptions

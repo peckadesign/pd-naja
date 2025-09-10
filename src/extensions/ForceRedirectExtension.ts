@@ -1,6 +1,6 @@
-import { Extension, Naja, PayloadEvent, SuccessEvent } from 'naja/dist/Naja'
+import { Extension, Naja, PayloadEvent, SuccessEvent } from 'naja'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Payload {
 		forceRedirect?: string
 	}
