@@ -60,10 +60,6 @@ export class ControlManager {
 	}
 
 	private initializeControlOnLoad(control: Control): void {
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', () => control.initialize(document), { once: true })
-		} else {
-			control.initialize(document)
-		}
+		this.naja.addEventListener('init', () => control.initialize(document), { once: true })
 	}
 }
