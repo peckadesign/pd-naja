@@ -1,7 +1,6 @@
-import { BeforeEvent, Extension, Naja } from 'naja/dist/Naja'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
+import { BeforeEvent, Extension, InteractionEvent, Naja } from 'naja'
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		pdModalPreventRedraw?: boolean
 	}

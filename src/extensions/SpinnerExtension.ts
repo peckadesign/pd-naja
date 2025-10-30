@@ -1,5 +1,4 @@
-import { CompleteEvent, Extension, Naja, StartEvent } from 'naja/dist/Naja'
-import { InteractionEvent } from 'naja/dist/core/UIHandler'
+import { CompleteEvent, Extension, InteractionEvent, Naja, StartEvent } from 'naja'
 import { SpinnerPropsFn, SpinnerType, WithSpinner } from '../types'
 import { hideSpinner, showSpinner } from '../utils'
 
@@ -17,7 +16,7 @@ import { hideSpinner, showSpinner } from '../utils'
  *    ii. If not, the spinner element is appended into `ajaxSpinnerWrapSelector` itself.
  */
 
-declare module 'naja/dist/Naja' {
+declare module 'naja' {
 	interface Options {
 		spinnerInitiator?: Element
 		spinnerQueue?: Element[]
@@ -75,7 +74,6 @@ export class SpinnerExtension implements Extension, WithSpinner {
 			options.spinnerQueue = options.spinnerQueue || []
 
 			placeholders.forEach((placeholder) => {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				options.spinnerQueue!.push(showSpinner.call(this, placeholder, spinnerInitiator))
 			})
 		}
