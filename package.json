@@ -33,6 +33,9 @@
 		"lint": "NODE_ENV=development eslint src --ext .ts --max-warnings=0"
 	},
 	"sideEffects": false,
+	"peerDependencies": {
+		"naja": "^3.3.1"
+	},
 	"devDependencies": {
 		"@rollup/plugin-babel": "^6.1.0",
 		"@rollup/plugin-commonjs": "^28.0.9",
@@ -41,7 +44,6 @@
 		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.4",
-		"naja": "^3.3.1",
 		"prettier": "^3.6.2",
 		"rollup": "^4.52.5",
 		"typescript": "^5.9.3",
