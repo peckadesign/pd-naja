@@ -8,6 +8,7 @@ import {
 	InteractionEvent,
 	Naja,
 	Options,
+	PayloadEvent,
 	StartEvent,
 	SuccessEvent
 } from 'naja'
@@ -107,6 +108,7 @@ export class AjaxModalExtension implements Extension {
 
 		naja.addEventListener('before', this.before.bind(this))
 		naja.addEventListener('start', this.abortPreviousRequest.bind(this))
+		naja.addEventListener('payload', this.normalizePayloadSnippets.bind(this))
 		naja.addEventListener('success', this.success.bind(this))
 		naja.addEventListener('complete', this.clearRequest.bind(this))
 
@@ -260,6 +262,26 @@ export class AjaxModalExtension implements Extension {
 		}
 
 		this.modal.show(options.modalOpener, options.modalOptions, event)
+	}
+
+	/**
+	 * Ensures that all reserved snippet IDs are present in the payload. Some snippets may be missing from the backend
+	 * response when not configured in a template, which can cause inconsistencies in modal updates or history handling.
+	 * This method normalizes the payload by adding empty strings for any missing snippets, ensuring a consistent
+	 * structure for Naja and modal updates.
+	 */
+	private normalizePayloadSnippets(event: PayloadEvent): void {
+		const { payload } = event.detail
+
+		if (!payload.snippets) {
+			return
+		}
+		const payloadSnippetsIds = Object.keys(payload.snippets)
+		const missingSnippetsIds = this.modal.reservedSnippetIds.filter((id) => !payloadSnippetsIds.includes(id))
+
+		missingSnippetsIds.forEach((id) => {
+			payload.snippets![id] = ''
+		})
 	}
 
 	private success(event: SuccessEvent): void {
