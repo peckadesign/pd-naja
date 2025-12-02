@@ -15,7 +15,7 @@ const delayedTextInputs = [
 	'datetime-local'
 ]
 
-class AutoSubmitControl implements Control {
+export class AutoSubmitControl implements Control {
 	public static readonly selector = '.js-auto-submit'
 
 	public initialize(context: Element | Document): void {
@@ -76,5 +76,3 @@ class AutoSubmitControl implements Control {
 		}
 	}
 }
-
-export default new AutoSubmitControl()

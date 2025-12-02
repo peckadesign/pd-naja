@@ -16,4 +16,6 @@ export { SpinnerExtension } from './extensions/SpinnerExtension'
 export { SuggestExtension } from './extensions/SuggestExtension'
 export { ToggleClassExtension } from './extensions/ToggleClassExtension'
 
+export { AutoSubmitControl } from './controls/AutoSubmitControl'
+
 export { isDatasetFalsy, isDatasetTruthy, showSpinner, hideSpinner } from './utils'
