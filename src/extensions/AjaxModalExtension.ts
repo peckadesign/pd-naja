@@ -271,9 +271,9 @@ export class AjaxModalExtension implements Extension {
 	 * structure for Naja and modal updates.
 	 */
 	private normalizePayloadSnippets(event: PayloadEvent): void {
-		const { payload } = event.detail
+		const { payload, options } = event.detail
 
-		if (!payload.snippets) {
+		if (!payload.snippets || !this.isPdModalRequest(options)) {
 			return
 		}
 		const payloadSnippetsIds = Object.keys(payload.snippets)
