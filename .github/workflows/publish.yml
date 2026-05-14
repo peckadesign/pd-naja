@@ -47,12 +47,9 @@ jobs:
           path: dist/
 
       - name: Create release draft 🕊️
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          files: |
-            dist/PdNaja.esm.js
-            dist/PdNaja.esm.js.map
+        run: gh release create "${{ github.ref_name }}" --draft --target "${{ github.sha }}" dist/PdNaja.esm.js dist/PdNaja.esm.js.map
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publishPublic:
     name: Publish (public)
