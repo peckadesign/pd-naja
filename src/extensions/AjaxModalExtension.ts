@@ -242,9 +242,10 @@ export class AjaxModalExtension implements Extension {
 			}
 		}
 
-		// If the state is build, the history is enabled. This information is needed inside modal callback where the
-		// options are not available, so we store this internally in extension.
-		this.historyEnabled = true
+		// Only mark history as enabled when we actually push/replace a modal state. Otherwise unrelated requests
+		// with `data-naja-history="replace"` would leave `historyEnabled = true` and cause `hiddenHandler` to
+		// call `history.back()` when a non-ajax modal is closed afterwards — navigating the user out of the page.
+		this.historyEnabled = isShown
 	}
 
 	private before(event: BeforeEvent): void {
