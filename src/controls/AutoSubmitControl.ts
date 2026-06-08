@@ -26,7 +26,7 @@ export class AutoSubmitControl implements Control {
 
 	private initializeForm(form: HTMLFormElement): void {
 		const submit = form.querySelector<HTMLElement>(`${AutoSubmitControl.selector}__submit`)
-		const timeout = form.dataset.autosubmitTimeout ? parseInt(form.dataset.autosubmitTimeout) : 200
+		const timeout = form.dataset.autoSubmitTimeout ? parseInt(form.dataset.autoSubmitTimeout) : 200
 		let timer: ReturnType<typeof setTimeout> | undefined = undefined
 
 		// Delay submission for "text" like inputs where the user writes the input
