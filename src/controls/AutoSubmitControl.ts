@@ -26,7 +26,7 @@ export class AutoSubmitControl implements Control {
 
 	private initializeForm(form: HTMLFormElement): void {
 		const submit = form.querySelector<HTMLElement>(`${AutoSubmitControl.selector}__submit`)
-		const timeout = form.dataset.autosubmitTimeout ? parseInt(form.dataset.autosubmitTimeout) : 200
+		const timeout = form.dataset.autoSubmitTimeout ? parseInt(form.dataset.autoSubmitTimeout) : 200
 		let timer: ReturnType<typeof setTimeout> | undefined = undefined
 
 		// Delay submission for "text" like inputs where the user writes the input
@@ -64,10 +64,17 @@ export class AutoSubmitControl implements Control {
 		})
 	}
 
-	private handleChange(target: HTMLElement, submit: HTMLElement | null, form: HTMLFormElement): void {
+	private handleChange(target: HTMLElement, fallbackSubmit: HTMLElement | null, form: HTMLFormElement): void {
 		if (isDatasetTruthy(target, 'autoSubmitDisabled')) {
 			return
 		}
+
+		// The element triggering the change may request a specific submit button by its `name` via
+		// `data-auto-submit-submit`; otherwise the `.js-auto-submit__submit` fallback is used.
+		const submitName = target.dataset.autoSubmitSubmit
+		const submit = submitName
+			? ((form.elements.namedItem(submitName) as HTMLElement | null) ?? fallbackSubmit)
+			: fallbackSubmit
 
 		if (submit) {
 			submit.click()
