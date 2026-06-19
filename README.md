@@ -8,14 +8,15 @@
    3. [AjaxOnceExtension](#ajaxonceextension)
    4. [BtnSpinnerExtension](#btnspinnerextension)
    5. [ConfirmExtension](#confirmextension)
-   6. [FollowUpRequestExtension](#followuprequestextension)
-   7. [ForceRedirectExtension](#forceredirectextension)
-   8. [ForceReplaceExtension](#forcereplaceextension)
-   9. [SingleSubmitExtension](#singlesubmitextension)
-   10. [SnippetFormPartExtension](#snippetformpartextension)
-   11. [SpinnerExtension](#spinnerextension)
-   12. [SuggestExtension](#suggestextensions)
-   13. [ToggleClassExtension](#toggleclassextension)
+   6. [CookieConsentExtension](#cookieconsentextension)
+   7. [FollowUpRequestExtension](#followuprequestextension)
+   8. [ForceRedirectExtension](#forceredirectextension)
+   9. [ForceReplaceExtension](#forcereplaceextension)
+   10. [SingleSubmitExtension](#singlesubmitextension)
+   11. [SnippetFormPartExtension](#snippetformpartextension)
+   12. [SpinnerExtension](#spinnerextension)
+   13. [SuggestExtension](#suggestextensions)
+   14. [ToggleClassExtension](#toggleclassextension)
 
 ## Quick start
 ```
@@ -108,6 +109,35 @@ The extension constructor receives 3 parameters:
 
 ### `ConfirmExtension`
 Simple extension that uses `window.confirm` before making the request, allowing the user to prevent the request from being made. It is enabled by setting the data attribute `data-confirm`. The value of the attribute is used as a parameter for the `window.confirm` call.
+
+### `CookieConsentExtension`
+This extension handles a cookie consent bar submitted via Naja. On load it looks for the consent element matching `.js-cookie-consent` and, if found, opens it as an accessible dialog using [`a11y-dialog`](https://a11y-dialog.netlify.app/). The form inside the bar is expected to match `.js-cookie-consent__form`.
+
+When the form is submitted (via Naja), the extension reads the accepted categories and runs the matching scripts that were deferred until consent was given. The behaviour of the buttons is driven by data attributes:
+
+| Attribute                                                          | Element        | Description                                                                                                                                |
+|--------------------------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `data-cookie-consent-accept-all`                                   | submit button  | When the form is submitted by this button, all categories are accepted regardless of the checkbox state.                                  |
+| `data-cookie-consent-reject-all`                                   | submit button  | When the form is submitted by this button, no category is accepted (even the checked ones).                                               |
+| `data-cookie-consent-category="<category>"`                        | form input     | Marks an input as belonging to a consent category. The category is accepted when the input is checked (or when "accept all" is used).     |
+| `data-cookie-consent="<category>"`                                 | `<script>` tag | Script that is executed only after consent for the given `<category>` has been granted.                                                   |
+
+Scripts that should wait for consent are rendered as inert `<script type="text/plain" data-cookie-consent="…">` tags. Once their category is accepted, the extension recreates them as runnable `<script>` elements (preserving `src`, `async`, `defer`, `crossOrigin` and `referrerPolicy`).
+
+After a successful submit the bar is closed: the extension dispatches a `cookieConsentBeforeClose` event, sets `data-modal-closing="true"` on the element (so a closing animation can run) and removes the element after the duration read from the `--pd-modal-closing-duration` CSS custom property, finally dispatching `cookieConsentAfterClose`.
+
+This extension depends on [`a11y-dialog`](https://www.npmjs.com/package/a11y-dialog), which is declared as an optional peer dependency. If you use this extension, install it alongside pd-naja:
+
+```
+$ npm install a11y-dialog
+```
+
+```typescript
+import naja from 'naja'
+import { CookieConsentExtension } from '@peckadesign/pd-naja'
+
+naja.registerExtension(new CookieConsentExtension())
+```
 
 ### `FollowUpRequestExtension`
 This extension allows you to chain multiple requests. This is useful, for example, within modals, where after redrawing the modal, you may need to redraw the page below it as well. This page may be from a different presenter, so you need to redraw with a different request. When used, this extension checks for the presence of `followUpUrl` in the payload. This is the URL to which the follow up request will be made.

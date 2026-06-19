@@ -34,13 +34,20 @@
 	},
 	"sideEffects": false,
 	"peerDependencies": {
+		"a11y-dialog": "^8.1.4",
 		"naja": "^3.3.1"
+	},
+	"peerDependenciesMeta": {
+		"a11y-dialog": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@rollup/plugin-babel": "^6.1.0",
 		"@rollup/plugin-commonjs": "^28.0.9",
 		"@rollup/plugin-node-resolve": "^16.0.3",
 		"@rollup/plugin-typescript": "^12.3.0",
+		"a11y-dialog": "^8.1.4",
 		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.4",

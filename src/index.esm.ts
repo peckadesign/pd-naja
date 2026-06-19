@@ -6,6 +6,7 @@ export { AjaxModalPreventRedrawExtension } from './extensions/AjaxModalPreventRe
 export { AjaxOnceExtension } from './extensions/AjaxOnceExtension'
 export { BtnSpinnerExtension } from './extensions/BtnSpinnerExtension'
 export { ConfirmExtension } from './extensions/ConfirmExtension'
+export { CookieConsentExtension } from './extensions/CookieConsentExtension'
 export { FollowUpRequestExtension } from './extensions/FollowUpRequestExtension'
 export { ForceRedirectExtension } from './extensions/ForceRedirectExtension'
 export { ForceReplaceExtension } from './extensions/ForceReplaceExtension'
