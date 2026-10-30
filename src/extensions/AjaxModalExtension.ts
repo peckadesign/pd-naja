@@ -9,6 +9,7 @@ import {
 	Naja,
 	Options,
 	PayloadEvent,
+	RestoreEvent,
 	StartEvent,
 	SuccessEvent
 } from 'naja'
@@ -105,10 +106,11 @@ export class AjaxModalExtension implements Extension {
 		naja.historyHandler.addEventListener('buildState', this.buildStateHandler.bind(this))
 
 		naja.snippetCache.addEventListener('fetch', this.onSnippetFetch.bind(this))
+		naja.snippetCache.addEventListener('restore', this.normalizeReservedSnippets.bind(this))
 
 		naja.addEventListener('before', this.before.bind(this))
 		naja.addEventListener('start', this.abortPreviousRequest.bind(this))
-		naja.addEventListener('payload', this.normalizePayloadSnippets.bind(this))
+		naja.addEventListener('payload', this.normalizeReservedSnippets.bind(this))
 		naja.addEventListener('success', this.success.bind(this))
 		naja.addEventListener('complete', this.clearRequest.bind(this))
 
@@ -266,22 +268,29 @@ export class AjaxModalExtension implements Extension {
 	}
 
 	/**
-	 * Ensures that all reserved snippet IDs are present in the payload. Some snippets may be missing from the backend
-	 * response when not configured in a template, which can cause inconsistencies in modal updates or history handling.
-	 * This method normalizes the payload by adding empty strings for any missing snippets, ensuring a consistent
-	 * structure for Naja and modal updates.
+	 * Ensures that all reserved snippet IDs are present in the payload or in the snippets restored from the history.
+	 * Some snippets may be missing from the backend response when not configured in a template, which can cause
+	 * inconsistencies in modal updates or history handling. This method normalizes the snippets by adding empty strings
+	 * for any missing snippets, ensuring a consistent structure for Naja and modal updates.
+	 *
+	 * A restored state may lack reserved snippets as well: after a page refresh, Naja replaces the state with a snapshot
+	 * of the full page, where the modal skeleton is not present yet, so only snippets present in the page are stored.
+	 * On restore, `options.pdModal` is set by `onSnippetFetch`, which Naja calls with the same `options` before the
+	 * `restore` event.
 	 */
-	private normalizePayloadSnippets(event: PayloadEvent): void {
-		const { payload, options } = event.detail
+	private normalizeReservedSnippets(event: PayloadEvent | RestoreEvent): void {
+		const { options } = event.detail
+		const snippets = 'payload' in event.detail ? event.detail.payload.snippets : event.detail.snippets
 
-		if (!payload.snippets || !this.isPdModalRequest(options)) {
+		if (!snippets || !this.isPdModalRequest(options)) {
 			return
 		}
-		const payloadSnippetsIds = Object.keys(payload.snippets)
-		const missingSnippetsIds = this.modal.reservedSnippetIds.filter((id) => !payloadSnippetsIds.includes(id))
+
+		const snippetsIds = Object.keys(snippets)
+		const missingSnippetsIds = this.modal.reservedSnippetIds.filter((id) => !snippetsIds.includes(id))
 
 		missingSnippetsIds.forEach((id) => {
-			payload.snippets![id] = ''
+			snippets[id] = ''
 		})
 	}
 
