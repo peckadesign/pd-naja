@@ -46,7 +46,7 @@ export interface AjaxModal {
 	reservedSnippetIds: string[]
 
 	show(opener: Element, options: any, event: BeforeEvent | PopStateEvent): void
-	hide(event: SuccessEvent | PopStateEvent): void
+	hide(event: SuccessEvent | PopStateEvent | MouseEvent): void
 	isShown(): boolean
 
 	onShow: CallbackFn
@@ -348,6 +348,8 @@ export class AjaxModalExtension implements Extension {
 		// This method is called after the modal has been hidden. It calls `history.back()` to start go-back procedure
 		// to eventually return to the state leading to opening the modal.
 		if (!this.historyEnabled) {
+			this.dispatchClosed()
+
 			return
 		}
 
@@ -396,6 +398,7 @@ export class AjaxModalExtension implements Extension {
 			}
 
 			this.hidePopstateFlag = false
+			this.dispatchClosed()
 		}
 
 		// This part handles the history forward procedure.
@@ -448,6 +451,10 @@ export class AjaxModalExtension implements Extension {
 				this.shouldPreventSnippetFetch = true
 			}
 		}
+	}
+
+	private dispatchClosed(): void {
+		document.dispatchEvent(new CustomEvent('ajaxModalClosed'))
 	}
 
 	private resetPdModalRefreshed(state: PdModalHistoryState): void {

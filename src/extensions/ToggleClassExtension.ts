@@ -13,10 +13,10 @@ declare module 'naja' {
 	}
 }
 
-export class ToggleClassExtension implements Extension {
-	private static selfSelector = ':self'
-	private static parentSelector = ':parent'
+const selfSelector = ':self'
+const parentSelector = ':parent'
 
+export class ToggleClassExtension implements Extension {
 	public initialize(naja: Naja) {
 		naja.uiHandler.addEventListener('interaction', this.checkExtensionEnabled.bind(this))
 		naja.addEventListener('start', this.start.bind(this))
@@ -74,13 +74,13 @@ export class ToggleClassExtension implements Extension {
 	private getTargetElementsSingleSelector(element: HTMLElement, selector: string): HTMLElement[] {
 		let baseElement: Element = element
 
-		if (selector === ToggleClassExtension.selfSelector) {
+		if (selector === selfSelector) {
 			return [element]
 		}
 
-		while (selector.startsWith(ToggleClassExtension.parentSelector) && baseElement.parentElement) {
+		while (selector.startsWith(parentSelector) && baseElement.parentElement) {
 			baseElement = baseElement.parentElement
-			selector = selector.slice(ToggleClassExtension.parentSelector.length + 1)
+			selector = selector.slice(parentSelector.length + 1)
 		}
 
 		return Array.from(baseElement.querySelectorAll(selector))

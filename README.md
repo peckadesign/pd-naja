@@ -5,18 +5,19 @@
 3. [Extensions](#extensions)
    1. [AjaxModalExtension](#ajaxmodalextension)
    2. [AjaxModalPreventRedrawExtension](#ajaxmodalpreventredrawextension)
-   3. [AjaxOnceExtension](#ajaxonceextension)
-   4. [BtnSpinnerExtension](#btnspinnerextension)
-   5. [ConfirmExtension](#confirmextension)
-   6. [CookieConsentExtension](#cookieconsentextension)
-   7. [FollowUpRequestExtension](#followuprequestextension)
-   8. [ForceRedirectExtension](#forceredirectextension)
-   9. [ForceReplaceExtension](#forcereplaceextension)
-   10. [SingleSubmitExtension](#singlesubmitextension)
-   11. [SnippetFormPartExtension](#snippetformpartextension)
-   12. [SpinnerExtension](#spinnerextension)
-   13. [SuggestExtension](#suggestextensions)
-   14. [ToggleClassExtension](#toggleclassextension)
+   3. [AjaxModalUnderlyingPageLinkExtension](#ajaxmodalunderlyingpagelinkextension)
+   4. [AjaxOnceExtension](#ajaxonceextension)
+   5. [BtnSpinnerExtension](#btnspinnerextension)
+   6. [ConfirmExtension](#confirmextension)
+   7. [CookieConsentExtension](#cookieconsentextension)
+   8. [FollowUpRequestExtension](#followuprequestextension)
+   9. [ForceRedirectExtension](#forceredirectextension)
+   10. [ForceReplaceExtension](#forcereplaceextension)
+   11. [SingleSubmitExtension](#singlesubmitextension)
+   12. [SnippetFormPartExtension](#snippetformpartextension)
+   13. [SpinnerExtension](#spinnerextension)
+   14. [SuggestExtension](#suggestextensions)
+   15. [ToggleClassExtension](#toggleclassextension)
 
 ## Quick start
 ```
@@ -79,16 +80,32 @@ naja.registerExtension(
 | `element: Element`                                                                                                                            | Most outer element of the modal window.                                                                                                                                                                                                                                                                                                                |
 | `reservedSnippetIds: string[]`                                                                                                                | List of snippet id's, that are neccessary for modal to work, e.g. `snippet--modal`.                                                                                                                                                                                                                                                                    |
 | `show(opener: Element \| undefined, options: any, event: BeforeEvent \| PopStateEvent): void`                                                 | Method that is called for opening the modal. `opener` is the element causing the opening, event is the associated event.                                                                                                                                                                                                                               |
-| `hide(event: SuccessEvent \| PopStateEvent): void`                                                                                            | Method that is called for closing the modal either as a result of `closeModal` property in ajax response or as a result of navigating using browser history.                                                                                                                                                                                           |                                            
+| `hide(event: SuccessEvent \| PopStateEvent \| MouseEvent): void`                                                                              | Method that is called for closing the modal either as a result of `closeModal` property in ajax response, as a result of navigating using browser history, or (with `AjaxModalUnderlyingPageLinkExtension`) as a result of a click on a link to the page under the modal.                                                                            |                                            
 | `isShown(): boolean`                                                                                                                          | Should return wheter the modal is opened or not.                                                                                                                                                                                                                                                                                                       |
 | `onShow: (callback: EventListener) => void`<br/>`onHide: (callback: EventListener) => void`<br/>`onHidden: (callback: EventListener) => void` | The extension needs to attach some handlers when show, hide or hidden happens. These functions should provide a way to add listeners to such events.                                                                                                                                                                                                   |
 | `dispatchLoad?: (options: any, event: SuccessEvent \| PopStateEvent) => void`                                                                 | If you provide this method, extension will call it whenever the content is changed (loaded).                                                                                                                                                                                                                                                           |
 | `getOptions(opener: Element): any`                                                                                                            | If you need to change some modal settings based on opener element, you can do that in this function. Return value of this function is stored in `localStorage` (or wherever is Naja configured to store states) and also in `HistoryState`. Bear in mind that this introduces some limitations of what can be returned (e.g. no `Element` is allowed). | 
 | `setOptions(options: any): void`                                                                                                              | Counterpart of `getOptions` method, you can use this method to restore modal settings based on `options`.                                                                                                                                                                                                                                              |
 
+#### Event `ajaxModalClosed`
+Dispatched on `document` after the modal has been closed, including the return in the history to the page under the modal.
+
 ### `AjaxModalPreventRedrawExtension`
 Occasionally we may have an ajax request invoked inside the modal window, but this request is not related to the modal window itself. However, because it is invoked from within the modal window, the HTTP header `Pd-Modal-Opened` is set. If enabled, this extension adds another header to the request, namely `Pd-Modal-Prevent-Redraw`. The extension can be enabled by adding the `data-naja-modal-prevent-redraw` data attribute to the interacted element, or by adding `pdModalPreventRedraw` to options.
 
+### `AjaxModalUnderlyingPageLinkExtension`
+With this extension, a non-ajax link inside the modal leading to the page under the modal (same origin and path, the query and the hash are ignored) closes the modal instead of loading the page again. When the link has a hash, the page is scrolled to its target after the modal is closed and the history has returned to the page under the modal, and the hash is added to the URL (using `history.replaceState()`, so the CSS `:target` is not applied). The focus is moved to the target, so the sequential focus navigation continues from it; a target which is not focusable gets a temporary `tabindex="-1"`, removed on blur. Projects styling `:focus` instead of `:focus-visible` may want to hide the outline of such targets, e.g. `[tabindex="-1"]:focus:not(:focus-visible) { outline: none }`. Links opened in another browsing context (a `target` other than `_self`, including `<base target>`) and links with `download` are not affected.
+
+Because the query is ignored, a non-ajax link to the same path with a different query only closes the modal as well; e.g. a signal link (`?do=…`), a pagination or a language switch is not followed. Such links inside the modal have to be ajax links, or the extension must not be used.
+
+The extension takes the same `modal` as `AjaxModalExtension` and has to be registered after it:
+
+```typescript
+naja.registerExtension(new AjaxModalExtension(modal))
+naja.registerExtension(new AjaxModalUnderlyingPageLinkExtension(modal))
+```
+
+The page under the modal is the URL shown right before the modal has been opened (when the modal is opened by going forward in the history, the URL of the last non-modal state). It is available through `getUnderlyingPageUrl()` while the modal is open, it is `null` when it is not known (e.g. after the page has been refreshed with the modal opened).
 
 ### `AjaxOnceExtension`
 This extension allows you to specify for a given element that the request will only be made on the first interaction. For example, for collapsible boxes, it is possible to make the request only once, when they are expanded for the first time. It is enabled by setting `data-naja-once` on the interacted element and allows the same element to control the collapsible box and make a request at the same time, without creating multiple unnecessary requests.

@@ -7,15 +7,16 @@ declare module 'naja' {
 	}
 }
 
+const selector = '.js-cookie-consent'
+
 export class CookieConsentExtension implements Extension {
 	private element: HTMLElement | null
 	private form: HTMLFormElement | null
 	private a11yDialog: A11yDialog | undefined
-	private static readonly selector = '.js-cookie-consent'
 
 	public constructor() {
-		this.element = document.querySelector<HTMLElement>(CookieConsentExtension.selector)
-		this.form = this.element?.querySelector<HTMLFormElement>(`${CookieConsentExtension.selector}__form`) || null
+		this.element = document.querySelector<HTMLElement>(selector)
+		this.form = this.element?.querySelector<HTMLFormElement>(`${selector}__form`) || null
 
 		if (!this.element || !this.form) {
 			return
