@@ -86,6 +86,9 @@ naja.registerExtension(
 | `getOptions(opener: Element): any`                                                                                                            | If you need to change some modal settings based on opener element, you can do that in this function. Return value of this function is stored in `localStorage` (or wherever is Naja configured to store states) and also in `HistoryState`. Bear in mind that this introduces some limitations of what can be returned (e.g. no `Element` is allowed). | 
 | `setOptions(options: any): void`                                                                                                              | Counterpart of `getOptions` method, you can use this method to restore modal settings based on `options`.                                                                                                                                                                                                                                              |
 
+#### Event `ajaxModalClosed`
+Dispatched on `document` after the modal has been closed, including the return in the history to the page under the modal.
+
 ### `AjaxModalPreventRedrawExtension`
 Occasionally we may have an ajax request invoked inside the modal window, but this request is not related to the modal window itself. However, because it is invoked from within the modal window, the HTTP header `Pd-Modal-Opened` is set. If enabled, this extension adds another header to the request, namely `Pd-Modal-Prevent-Redraw`. The extension can be enabled by adding the `data-naja-modal-prevent-redraw` data attribute to the interacted element, or by adding `pdModalPreventRedraw` to options.
 
