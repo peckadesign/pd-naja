@@ -46,7 +46,7 @@ export interface AjaxModal {
 	reservedSnippetIds: string[]
 
 	show(opener: Element, options: any, event: BeforeEvent | PopStateEvent): void
-	hide(event: SuccessEvent | PopStateEvent): void
+	hide(event: SuccessEvent | PopStateEvent | MouseEvent): void
 	isShown(): boolean
 
 	onShow: CallbackFn
