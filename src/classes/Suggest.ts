@@ -16,12 +16,31 @@ export class Suggest {
 	public readonly spinner?: SpinnerType
 	public readonly getSpinnerProps?: SpinnerPropsFn
 
-	public static readonly className = 'js-suggest'
-	public static readonly formClassName = `${Suggest.className}__form`
-	public static readonly inputClassName = `${Suggest.className}__input`
-	public static readonly buttonClassName = `${Suggest.className}__btn`
-	public static readonly suggestClassName = `${Suggest.className}__suggest`
-	public static readonly linkClassName = `${Suggest.className}__link`
+	// Static getters instead of static properties: TypeScript emits static properties as assignments after the class,
+	// which bundlers treat as side effects, and the class could not be tree-shaken.
+	public static get className(): string {
+		return 'js-suggest'
+	}
+
+	public static get formClassName(): string {
+		return `${Suggest.className}__form`
+	}
+
+	public static get inputClassName(): string {
+		return `${Suggest.className}__input`
+	}
+
+	public static get buttonClassName(): string {
+		return `${Suggest.className}__btn`
+	}
+
+	public static get suggestClassName(): string {
+		return `${Suggest.className}__suggest`
+	}
+
+	public static get linkClassName(): string {
+		return `${Suggest.className}__link`
+	}
 
 	public readonly element: HTMLElement
 	public readonly form: HTMLFormElement

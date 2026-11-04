@@ -16,7 +16,10 @@ const delayedTextInputs = [
 ]
 
 export class AutoSubmitControl implements Control {
-	public static readonly selector = '.js-auto-submit'
+	// A static getter instead of a static property, see `Suggest`.
+	public static get selector(): string {
+		return '.js-auto-submit'
+	}
 
 	public initialize(context: Element | Document): void {
 		const forms = context.querySelectorAll<HTMLFormElement>(AutoSubmitControl.selector)
